@@ -61,4 +61,27 @@
         }
         
     }
+
+    //Função que valida e cria o diretório Dats
+    public static bool ValidarDats()
+    {
+        //Concatena caminho + nome do diretório
+        string caminho = AppContext.BaseDirectory + "Dats";
+
+        try
+        {
+            //Se o diretório não existe, cria um novo diretório Dats
+            if (!Directory.Exists(caminho))
+            {
+                Directory.CreateDirectory(caminho);
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            //Se ocorrer alum erro no processo, retorna um false
+            Console.WriteLine(e.Message);
+            return false;
+        }
+    }
 }
