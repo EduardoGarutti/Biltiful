@@ -1,32 +1,61 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using System.Globalization;
 public class Produto
 {
 
     public string CodigoBarras { get; private set; }
     public string Nome { get; private set; }
     public double ValorVenda { get; private set; }
-    public DateTime UltimaVenda { get; private set; }
-    public DateTime DataCadastro { get; private set; }
+    public DateOnly UltimaVenda { get; private set; }
+    public DateOnly DataCadastro { get; private set; }
     public char Situacao { get; private set; }
     //public int QtdDisponivel { get; set; } 
 
+    private static readonly CultureInfo ptBR = new CultureInfo("pt-BR"); //pedi pro amigão para poder formatar com 000,00
+
     public static readonly string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "dats", "produto.dat"); //sobe 3 niveis de pasta a partir do do bin do projeto
 
+    public Produto()
+    {
 
-    Produto(string nome, double valor)
+    }
+
+    public Produto(string nome, double valor)
     {
         CodigoBarras = "789" + Random.Shared.NextInt64(1000000000, 10000000000); // gera um numero aleatorio de 10 digitos e conctena com os outros 3 do comeco
         SetNome(nome);
         SetValor(valor);
-        UltimaVenda = DateTime.Now;
-        DataCadastro = DateTime.Now;
+        DataCadastro = DateOnly.FromDateTime(DateTime.Now);
+        UltimaVenda = DataCadastro;
         Situacao = 'A';
         
     }
 
+    public static List<Produto> CarregarProdutos()
+    {
 
+        List<Produto> lista = new List<Produto>();
+        if (!File.Exists(filePath))
+            return lista;
 
+        foreach(string linha in File.ReadAllLines(filePath))
+        {
+
+            Produto p = new Produto();
+            p.Nome = linha.Substring(0, 20);
+            p.ValorVenda = double.Parse(linha.Substring(20, 6));
+            p.CodigoBarras = linha.Substring(26, 13);
+            p.DataCadastro = DateOnly.Parse(linha.Substring(39, 10));
+            p.UltimaVenda = DateOnly.Parse(linha.Substring(49, 10));
+            p.Situacao = char.Parse(linha.Substring(59, 1));
+
+            lista.Add(p);
+
+        }
+
+        return lista;
+
+    }
 
     public static Produto CadastrarProduto()
     {
@@ -84,7 +113,7 @@ public class Produto
 
     public string ToStringFile()
     {
-        return $"{Nome} {ValorVenda} {CodigoBarras} {UltimaVenda} {DataCadastro} {Situacao}";
+        return $"{Nome}{ValorVenda.ToString("000.00", ptBR)}{CodigoBarras}{UltimaVenda}{DataCadastro}{Situacao}";
     }
 
 

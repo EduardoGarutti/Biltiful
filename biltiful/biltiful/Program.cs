@@ -1,3 +1,6 @@
 ﻿Console.WriteLine("Hello, World!");
 
-Produto.CadastrarProduto();
+//Produto.CadastrarProduto();
+
+
+Produto.CarregarProdutos();
