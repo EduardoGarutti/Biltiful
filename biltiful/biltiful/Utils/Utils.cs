@@ -84,4 +84,20 @@
             return false;
         }
     }
+
+    //Função que cria menu by: pestana
+    public static char CriarMenu(List<string> options)
+    {
+        foreach (string item in options)
+            Console.Write(item);
+        try
+        {
+            Console.Write("Informe a opção desejada: ");
+            return char.TryParse(Console.ReadLine(), out char option) ? option : '\0';
+        }
+        catch
+        {
+            return '\0';
+        }
+    }
 }
