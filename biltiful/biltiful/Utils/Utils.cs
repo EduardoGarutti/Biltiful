@@ -102,4 +102,27 @@ public static class Utils
         return false;
 
     }
+
+    public static bool TentarNovamente()
+    {
+        while (true)
+        {
+            var op = Utils.CriarMenu(new List<string>(){
+            "Deseja tentar o cadastro novamente?\n",
+            "[1] - Sim\n",
+            "[2] - Não"
+    });
+
+            switch (op)
+            {
+                case '1':
+                    return true;
+                case '2':
+                    return false;
+                default:
+                    Console.WriteLine("Opção invalida");
+                    break;
+            }
+        }
+    }
 }
