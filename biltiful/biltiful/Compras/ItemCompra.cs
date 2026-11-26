@@ -1,105 +1,150 @@
-﻿public class ItemCompra
+﻿using System.Text.RegularExpressions;
+
+public class ItemCompra
 {
-    // Identificador da compra a qual este item pertence.
+    // Identificador da compra à qual o item pertence.
     public int Id { get; private set; }
 
-    // Data da compra. Deve corresponder a data da entidade Compra.
-    public DateOnly DataCompra { get; private set; }
+    // Deve corresponder à data da compra associada.
+    public DateTime DataCompra { get; private set; }
 
     // Identificador da matéria-prima adquirida.
-    public string MateriaPrimaId { get; private set; }
+    public string MateriaPrima { get; private set; }
 
-    // Quantidade de matéria-prima adquirida.
     public double Quantidade { get; private set; }
 
-    // Valor unitário da matéria-prima no momento da compra.
-    //Se futuramente o preço da matéria-prima mudar, o valor da
-    //compra antiga continuará sendo o mesmo
+    // Preserva o valor unitário praticado no momento da compra.
     public double ValorUnitario { get; private set; }
 
-    //Responsável por combinar partes de um caminho,
-    //utilizando os separadores apropriados do sistema operacional
-    private static string CaminhoArquivo = Path.Combine(Utils.CaminhoDats, "ItemCompra.dat");
-
-    // Construtor responsável por validar os parâmetros recebidos
-    // antes de atribuí-los às propriedades do objeto.
-    public ItemCompra(int id, DateOnly dataCompra,
-                      string materiaPrimaId,
-                      double quantidade,
-                      double valorUnitario)
-    {
-        //Verificacoes antes de instaciar um objeto
-
-        // Verifica se o identificador está dentro dos limites permitidos.
-        if (!ValidarId(id))
-        {
-            //ArgumentException é uma exceção do .NET lançada quando um método recebe um argumento inválido ou fora do esperado.
-            throw new ArgumentException("Id inválido.");
-        }
-
-        // Verifica se a quantidade informada é válida.
-        if (!ValidarQuantidade(quantidade))
-        {
-            throw new ArgumentException("Quantidade inválida.");
-        }
-
-        // Verifica se o valor unitário está dentro dos limites permitidos.
-        if (!ValidarValorUnitario(valorUnitario))
-        {
-            throw new ArgumentException("Valor unitário inválido.");
-        }
-
-        // Verifica se o resultado da multiplicação da quantidade
-        // pelo valor unitário respeita o limite total do item.
-        if (!ValidarTotalItem(quantidade, valorUnitario))
-        {
-            throw new ArgumentException("Total do item excedeu o limite.");
-        }
-
-        // Após passar pelas validações, os parâmetros
-        // são atribuídos às propriedades do objeto.
-        Id = id;
-        DataCompra = dataCompra;
-        MateriaPrimaId = materiaPrimaId;
-        Quantidade = quantidade;
-        ValorUnitario = valorUnitario;
-    }
-
-    // Propriedade calculada que representa o valor total do item.
-    // Não possui set, pois seu valor depende de outras propriedades.
+    // Propriedade calculada com base na quantidade e no valor unitário.
     public double TotalItem
     {
         get
         {
-            // Multiplica a quantidade pelo valor unitário
-            // e arredonda o resultado para duas casas decimais.
             return Math.Round(Quantidade * ValorUnitario, 2);
         }
     }
 
-    // Valida se o ID está entre 1 e 99999.
-    private bool ValidarId(int id)
+    // Construtor responsável por validar e inicializar o item.
+    public ItemCompra(int id, DateTime dataCompra,
+                      string materiaPrimaId,
+                      double quantidade,
+                      double valorUnitario)
     {
-        return id >= 1 && id <= 99999;
+        ValidarId(id);
+        ValidarMateriaPrimaId(materiaPrimaId);
+        ValidarQuantidade(quantidade);
+        ValidarValorUnitario(valorUnitario);
+        ValidarTotalItem(quantidade, valorUnitario);
+
+        Id = id;
+        DataCompra = dataCompra;
+        MateriaPrima = materiaPrimaId;
+        Quantidade = quantidade;
+        ValorUnitario = valorUnitario;
     }
 
-    // Valida se a quantidade é positiva e respeita o limite máximo.
-    private bool ValidarQuantidade(double quantidade)
+    // Retorna o índice do item ou -1 caso não seja encontrado.
+    public static int LocalizarItemCompra(
+        List<ItemCompra> itensCompra,
+        int compraId,
+        string materiaPrimaId)
     {
-        return quantidade > 0 && quantidade <= 999.99;
+        for (int i = 0; i < itensCompra.Count; i++)
+        {
+            if (itensCompra[i].Id == compraId &&
+                itensCompra[i].MateriaPrima == materiaPrimaId)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
-    // Valida se o valor unitário é positivo e respeita o limite máximo.
-    private bool ValidarValorUnitario(double valorUnitario)
+    // Retorna somente os itens pertencentes à compra informada.
+    public static List<ItemCompra> ListarItensDaCompra(
+        List<ItemCompra> itensCompra, int compraId)
     {
-        return valorUnitario > 0 && valorUnitario <= 999.99;
+        List<ItemCompra> itensEncontrados = new List<ItemCompra>();
+
+        foreach (ItemCompra item in itensCompra)
+        {
+            if (item.Id == compraId)
+            {
+                itensEncontrados.Add(item);
+            }
+        }
+
+        return itensEncontrados;
     }
 
-    // Valida se o valor total do item respeita o limite máximo.
-    private bool ValidarTotalItem(double quantidade, double valorUnitario)
+    // =====================================================
+    // Métodos auxiliares de validação. XDDDD 
+    // =====================================================
+
+    // Método auxiliar que valida os limites do identificador.
+    private static void ValidarId(int id)
     {
-        return Math.Round(quantidade * valorUnitario, 2) <= 9999.99;
+        if (id < 1 || id > 99999)
+        {
+            throw new ArgumentException("Id inválido.");
+        }
     }
 
+    // Método auxiliar que valida o formato MP0000.
+    private static void ValidarMateriaPrimaId(string materiaPrimaId)
+    {
+        //Regex obtida atraves do chatGPT 
+        if (string.IsNullOrWhiteSpace(materiaPrimaId) ||
+            !Regex.IsMatch(materiaPrimaId, @"^MP[0-9]{4}$"))
+        {
+            throw new ArgumentException(
+                "Identificador da matéria-prima inválido.");
+        }
+    }
 
+    // Método auxiliar que valida os limites da quantidade.
+    private static void ValidarQuantidade(double quantidade)
+    {
+
+        if (quantidade <= 0)
+        {
+            throw new ArgumentException(
+                "A quantidade deve ser maior que zero");
+        }
+
+        if (quantidade > 999.99)
+        {
+            throw new ArgumentException(
+                "A quantidade ultrapassa o limite permitido de 999,99");
+        }
+    }
+
+    // Método auxiliar que valida os limites do valor unitário.
+    private static void ValidarValorUnitario(double valorUnitario)
+    {
+        if (double.IsNaN(valorUnitario) || valorUnitario <= 0)
+        {
+            throw new ArgumentException(
+                "O valor unitário deve ser maior que zero");
+        }
+
+        if (valorUnitario > 999.99)
+        {
+            throw new ArgumentException(
+                "O valor unitário ultrapassa o limite permitido de R$ 999,99");
+        }
+    }
+
+    // Método auxiliar que valida o limite financeiro do item.
+    private static void ValidarTotalItem(
+        double quantidade, double valorUnitario)
+    {
+        if (Math.Round(quantidade * valorUnitario, 2) > 9999.99)
+        {
+            throw new ArgumentException(
+                "O valor total do item ultrapassa o limite permitido de R$ 9.999,99");
+        }
+    }
 }

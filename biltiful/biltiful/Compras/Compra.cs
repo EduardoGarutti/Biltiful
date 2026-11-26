@@ -193,19 +193,25 @@ public class Compra : TransacaoComercial
     // Carrega as compras gravadas no arquivo.
     public static List<Compra> CarregarCompras(string caminhoArquivo)
     {
+        //A lista é preenchida com os objetos retornados do arquivo
         List<Compra> compras = new List<Compra>();
 
+        //Caso não exista o arquico de compras, método retorna uma lista vazia 
         if (!File.Exists(caminhoArquivo))
         {
             return compras;
         }
 
+        //O StreamReader realiza a leitura do arquivo
         using (StreamReader sr = new StreamReader(caminhoArquivo))
         {
             string? linha;
 
             while ((linha = sr.ReadLine()) != null)
             {
+                //Lê uma linha do arquivo.
+                //Atribui seu conteúdo à variável linha
+                //Verifica se o resultado é diferente de null.
                 if (linha.Length != 35)
                 {
                     throw new FormatException("Registro de compra inválido.");
@@ -213,6 +219,11 @@ public class Compra : TransacaoComercial
 
                 int id = int.Parse(linha.Substring(0, 5).Trim());
 
+                //ParseExact() interpreta essa string utilizando exatamente o formato ddMMyyyy
+                //5: índice a partir do qual começaremos a leitura.
+                //8: quantidade de caracteres que serão extraídos.
+                //CultureInfo.InvariantCulture) permite que a conversão de dados aconteça de maneira
+                //independente das configurações regionais do computador
                 DateTime dataCompra = DateTime.ParseExact(
                     linha.Substring(5, 8),
                     "ddMMyyyy",
