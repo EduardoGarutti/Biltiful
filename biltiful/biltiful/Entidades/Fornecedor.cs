@@ -1,17 +1,94 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 public class Fornecedor : EntidadeBase
 {
     public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Fornecedor.dat"));
 
     public string CNPJ { get; set; }
+    public string RazaoSocial { get; set; }
+    public DateTime DataAbertura { get; set; }
 
-    public Fornecedor(string cnpj, string nome, string dataNascimento) : base(nome, dataNascimento)
+
+    public Fornecedor(string cnpj, string razaoSocial, DateTime dataAbertura)
     {
         this.CNPJ = cnpj;
+        this.RazaoSocial = razaoSocial;
+        this.DataAbertura = dataAbertura;
+    }
 
-        VerificarExistenciaDoArquivo(CaminhoArquivo);
-        Cadastrar();
+    public static List<Fornecedor> CarregarFornecedores()
+    {
+        Utils.ValidarCaminho(CaminhoArquivo);
+
+        List<Fornecedor> listaFornecedores = new List<Fornecedor>();
+
+        string[] fornecedores = File.ReadAllLines(CaminhoArquivo);
+
+        foreach (var fornecedor in fornecedores)
+        {
+            string cnpj = fornecedor.Substring(0, 18);
+            string razaoSocial = fornecedor.Substring(18, 68);
+            DateTime abertura = DateTime.ParseExact(fornecedor.Substring(68, 78), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+            Fornecedor fornecedorCarregado = new Fornecedor(cnpj, razaoSocial, abertura);
+
+            fornecedorCarregado.DataUltimaCompra = DateTime.ParseExact(fornecedor.Substring(78, 88), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            fornecedorCarregado.DataCadastro = DateTime.ParseExact(fornecedor.Substring(88, 98), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            fornecedorCarregado.Situacao = Enum.Parse<ESituacao>(fornecedor[98].ToString());
+
+            listaFornecedores.Add(fornecedorCarregado);
+        }
+
+        return listaFornecedores;
+    }
+
+    public static Fornecedor CadastrarFornecedor(List<Fornecedor> lista, string cnpj, string razaoSocial, DateTime abertura, bool Editando = false)
+    {
+
+        if (LocalizarFornecedor(lista, cnpj) != -1 && !Editando) throw new Exception("Já existe um fornecedor com esse CNPJ");
+        if (LocalizarFornecedor(lista, cnpj) == -1 && Editando) throw new Exception("Não existe um fornecedor com esse CNPJ");
+
+        ValidarCNPJ(cnpj);
+        ValidarNome(razaoSocial);
+        ValidarData(abertura);
+
+        return new Fornecedor(cnpj, razaoSocial, abertura);
+    }
+
+    public static int LocalizarFornecedor(List<Fornecedor> lista, string cnpj)
+    {
+        Fornecedor fornecedorComCNPJExistente = lista.Find(fornecedor => fornecedor.CNPJ == cnpj);
+
+        if (lista.Contains(fornecedorComCNPJExistente)) return lista.IndexOf(fornecedorComCNPJExistente);
+        else return -1;
+    }
+
+    public static Fornecedor EditarFornecedor(List<Fornecedor> lista, string cnpj, string novaRazaoSocial, DateTime novaDataAbertura)
+    {
+        return CadastrarFornecedor(lista, cnpj, novaRazaoSocial, novaDataAbertura, true);
+    }
+
+    public static void GravarNoArquivo(List<Fornecedor> fornecedores)
+    {
+
+        var writer = new StreamWriter(CaminhoArquivo, true);
+        File.WriteAllText(CaminhoArquivo, "");
+
+        foreach (var fornecedor in fornecedores)
+        {
+            string informacoesDoFornecedor = $"{fornecedor.CNPJ}" +
+                                             $"{fornecedor.RazaoSocial.PadRight(50)}" +
+                                             $"{fornecedor.DataAbertura.ToString("dd/MM/yyyy")}" +
+                                             $"{fornecedor.DataUltimaCompra.ToString("dd/MM/yyyy")}" +
+                                             $"{fornecedor.DataCadastro.ToString("dd/MM/yyyy")}" +
+                                             $"{fornecedor.Situacao}";
+
+            writer.WriteLine(informacoesDoFornecedor);
+
+        }
+
+        writer.Close();
     }
 
     public static bool ValidarCNPJ(string cnpj)
@@ -82,39 +159,5 @@ public class Fornecedor : EntidadeBase
         }
 
         return true;
-    }
-
-    public void Cadastrar()
-    {
-        string fornecedor = $"{this.CNPJ}" +
-                            $"{this.Nome.PadRight(50)}" +
-                            $"{this.DataNascimento.ToString("dd/MM/yyyy")}" +
-                            $"{this.DataUltimaCompra.ToString("dd/MM/yyyy")}" +
-                            $"{this.DataCadastro.ToString("dd/MM/yyyy")}" +
-                            $"{this.ESituacao}";
-
-        var writer = new StreamWriter(CaminhoArquivo, true);
-
-        writer.WriteLine(fornecedor);
-        writer.Close();
-
-    }
-    
-    public string LocalizarFornecedor(string cnpjProcurado)
-    {
-        string[] fornecedores = File.ReadAllLines(CaminhoArquivo);
-
-        foreach (var fornecedor in fornecedores)
-        {
-            string cnpj = fornecedor.Substring(0, 18);
-
-            if(cnpj == cnpjProcurado)
-            {
-                return fornecedor;
-            }
-
-        }
-
-        return "Não foi encontrado nenhum fornecedor com esse CNPJ";
     }
 }

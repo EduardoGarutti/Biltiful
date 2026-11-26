@@ -1,19 +1,99 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 public class Cliente : EntidadeBase
 {
     public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Clientes.dat"));
 
     public string CPF { get; set; }
+    public string Nome { get; set; }
+    public DateTime DataNascimento { get; set; }
     public char Sexo { get; set; }
 
-    public Cliente(string cpf, char sexo, string nome, string dataNascimento) : base( nome, dataNascimento)
+    public Cliente(string cpf, string nome, DateTime dataNascimento, char sexo)
     {
         this.CPF = cpf;
+        this.Nome = nome;
+        this.DataNascimento = dataNascimento;
         this.Sexo = sexo;
-
-        VerificarExistenciaDoArquivo(CaminhoArquivo);
     }
+    public static List<Cliente> CarregarClientes()
+    {
+        Utils.ValidarCaminho(CaminhoArquivo);
+
+        List<Cliente> listaClientes = new List<Cliente>();
+
+        string[] clientes = File.ReadAllLines(CaminhoArquivo);
+
+        foreach (var cliente in clientes)
+        {
+            string cpf = cliente.Substring(0, 14);
+            string nome = cliente.Substring(14, 64);
+            DateTime nascimento = DateTime.ParseExact(cliente.Substring(64, 74), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            char sexo = cliente[74];
+
+            Cliente clienteCarregado = new Cliente(cpf, nome, nascimento, sexo);
+
+            clienteCarregado.DataUltimaCompra = DateTime.ParseExact(cliente.Substring(75, 85), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            clienteCarregado.DataCadastro = DateTime.ParseExact(cliente.Substring(85, 95), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            clienteCarregado.Situacao = Enum.Parse<ESituacao>(cliente[95].ToString());
+
+            listaClientes.Add(clienteCarregado);
+        }
+
+        return listaClientes;
+    }
+
+    public static Cliente CadastrarCliente(List<Cliente> lista, string cpf, string nome, DateTime nascimento, char sexo, bool Editando = false)
+    {
+
+        if (LocalizarCliente(lista, cpf) != -1 && !Editando) throw new Exception("Já existe um cliente com esse CPF");
+        if (LocalizarCliente(lista, cpf) == -1 && Editando) throw new Exception("Não existe um cliente com esse CPF");
+
+        ValidarCPF(cpf);
+        ValidarNome(nome);
+        ValidarData(nascimento);
+        ValidarSexo(sexo);
+
+        return new Cliente(cpf, nome, nascimento, sexo);
+    }
+
+    public static int LocalizarCliente(List<Cliente> lista, string cpf)
+    {
+        Cliente clienteComCPFExistente = lista.Find(cliente => cliente.CPF == cpf);
+
+        if (lista.Contains(clienteComCPFExistente)) return lista.IndexOf(clienteComCPFExistente);
+        else return -1;
+    }
+
+    public static Cliente EditarCliente(List<Cliente> lista, string cpf, string novoNome, DateTime novaDataNascimento, char novoSexo)
+    {
+        return CadastrarCliente(lista, cpf, novoNome, novaDataNascimento, novoSexo, true);
+    }
+
+    public static void GravarNoArquivo(List<Cliente> clientes)
+    {
+
+        var writer = new StreamWriter(CaminhoArquivo, true);
+        File.WriteAllText(CaminhoArquivo, "");
+
+        foreach (var cliente in clientes)
+        {
+            string informacoesDoCliente = $"{cliente.CPF}" +
+                                          $"{cliente.Nome.PadRight(50)}" +
+                                          $"{cliente.DataNascimento.ToString("dd/MM/yyyy")}" +
+                                          $"{cliente.Sexo}" +
+                                          $"{cliente.DataUltimaCompra.ToString("dd/MM/yyyy")}" +
+                                          $"{cliente.DataCadastro.ToString("dd/MM/yyyy")}" +
+                                          $"{cliente.Situacao}";
+
+            writer.WriteLine(informacoesDoCliente);
+            
+        }
+
+        writer.Close();
+    }
+
     public static bool ValidarSexo(char sexo)
     {
         string sexoFormatado = sexo.ToString().ToLower();
@@ -21,7 +101,6 @@ public class Cliente : EntidadeBase
 
         return true;
     }
-
 
     public static bool ValidarCPF(string cpf)
     {
@@ -85,67 +164,6 @@ public class Cliente : EntidadeBase
         return true;
     }
 
-    public static Cliente CadastrarCliente(List<Cliente> lista, string cpf, string nome, string nascimento, char sexo)
-    {
-        return new Cliente(cpf, sexo, nome, nascimento);
-    }
-
-    public static int LocalizarCPF(List<Cliente> lista, string cpf)
-    {
-        Cliente clienteComCPFRepetido = lista.Find(cliente => cliente.CPF == cpf);
-
-        if (lista.Contains(clienteComCPFRepetido)) return lista.IndexOf(clienteComCPFRepetido);
-        else return -1;
-    }
-
-    public static List<Cliente> CarregarClientes()
-    {
-        List<Cliente> listaClientes = new List<Cliente>();
-
-        string[] clientes = File.ReadAllLines(CaminhoArquivo);
-
-        foreach (var cliente in clientes)
-        {
-            string cpf = cliente.Substring(0, 14);
-            string nome = cliente.Substring(14, 64);
-            string nascimento = cliente.Substring(64, 74);
-            char sexo = cliente[74];
-            Cliente clienteCarregado = new Cliente(cpf, sexo, nome, nascimento);
-            clienteCarregado.DataUltimaCompra = DateOnly.ParseExact(cliente.Substring(75, 85), "dd/MM/yyyy");
-            clienteCarregado.DataCadastro = DateOnly.ParseExact(cliente.Substring(85, 95), "dd/MM/yyyy");
-            clienteCarregado.ESituacao = cliente[95];
-
-            listaClientes.Add(clienteCarregado);
-        }
-
-        return listaClientes;
-    }
-
-    public void EditarCliente(List<Cliente> lista, string cpf, string novoNome, string novaDataNascimento, char novoSexo)
-    {
-        int indiceDoClienteASerEditado = LocalizarCPF(lista, cpf);
-
-        lista[indiceDoClienteASerEditado].Nome = novoNome;
-        lista[indiceDoClienteASerEditado].DataNascimento = DateOnly.ParseExact(novaDataNascimento, "dd/MM/yyyy");
-        lista[indiceDoClienteASerEditado].Sexo = novoSexo;
-
-    }
-
-    public static void GravarNoArquivo(List<Cliente> clientes)
-    {
-        
-
-        foreach (var cliente in clientes)
-        {
-            string informacoesDoCliente = $"{cliente.CPF}" +
-                                          $"{cliente.Nome.PadRight(50)}" +
-                                          $"{cliente.DataNascimento.ToString("dd/MM/yyyy")} " +
-                                          $"{cliente.Sexo}" +
-                                          $"{cliente.DataUltimaCompra.ToString("dd/MM/yyyy")}" +
-                                          $"{cliente.DataCadastro.ToString("dd/MM/yyyy")}" +
-                                          $"{cliente.ESituacao}";
-        }
-    }
 
 
 }
