@@ -6,19 +6,43 @@
     {
         try
         {
-            base.Cadastrar(cpf, this.Arquivo );
+            base.Cadastrar(cpf, this.Arquivo);
             return true;
         }
-        catch
+        catch (Exception ex)
         {
-            Console.WriteLine("Erro ao cadastrar CPF bloqueado");
+            Console.WriteLine(ex.Message);
             return false;
         }
     }
 
     public bool Localizar(string cnpf)
     {
-        return base.Localizar(cnpf, this.Arquivo);
-
+        try
+        {
+            return base.Localizar(cnpf, this.Arquivo);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return false;
+        }
     }
+
+    public bool Remover(string cpf) {
+
+        try
+        {
+            base.Remover(cpf, this.Arquivo);
+            return true;
+        }
+        catch (Exception ex) {
+
+            Console.WriteLine(ex.Message);
+            return false;
+
+        }
+    
+    }
+
 }

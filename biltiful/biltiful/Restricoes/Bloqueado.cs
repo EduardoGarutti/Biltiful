@@ -17,8 +17,29 @@
 
     public bool Localizar(string cnpf) {
 
-        return base.Localizar(cnpf, this.Arquivo);
+        try
+        {
+            return base.Localizar(cnpf, this.Arquivo);
+        }
+        catch(Exception ex) 
+        {
+            Console.WriteLine(ex.Message);
+            return false;
+        }
 
     }
 
+    public bool Remover(string cnpf)
+    {
+        try
+        {
+            base.Remover(cnpf, this.Arquivo);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return false;
+        }
+    }
 }
