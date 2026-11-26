@@ -1,25 +1,22 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-public class Producao
+﻿public class Producao
 {
     public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Produto.dat"));
     public static int Contador = 1;
     public int Id { get; private set; } //99.999 5 dig
-    public DateOnly DataProducao { get; private set; } //dd/mm/yyyy
+    public DateTime DataProducao { get; private set; } //dd/mm/yyyy
     public string Produto { get; private set; } //13
     public int Quantidade { get; private set; } //999,99 5 dig
-    private static List<Producao> Producoes = new List<Producao>();
 
-    public Producao(DateOnly dataProducao, string produto, int quantidade)
+    public Producao(DateTime dataProducao, string produto, int quantidade)
     {
         Id = Contador;
         DataProducao = dataProducao;
         Produto = produto;
         Quantidade = quantidade;
-        
+
     }
 
-    public Producao(int id,DateOnly dataProducao, string produto, int quantidade)
+    public Producao(int id, DateTime dataProducao, string produto, int quantidade)
     {
         Id = id;
         DataProducao = dataProducao;
@@ -27,38 +24,38 @@ public class Producao
         Quantidade = quantidade;
     }
 
-    public Producao(string produto, int quantidade)
+    public Producao(int id, string produto, int quantidade)
     {
         Id = Contador;
         Contador++;
-        DataProducao = DateOnly.FromDateTime(DateTime.Now);
+        DataProducao = DateTime.Now;
         Produto = produto;
         Quantidade = quantidade;
     }
 
-    private bool ValidarCaminho()
-    {
-        if (true)//vai ser a verificacao do utils se a pasta existe
-        {
-            if (!File.Exists(CaminhoArquivo))
-            {
-                File.Create(CaminhoArquivo).Close();
-                return true;
-            }
-            else
-            {
-                return true;
-            }
-        }
-    }
+    //private bool ValidarCaminho()
+    //{
+    //    if (true)//vai ser a verificacao do utils se a pasta existe
+    //    {
+    //        if (!File.Exists(CaminhoArquivo))
+    //        {
+    //            File.Create(CaminhoArquivo).Close();
+    //            return true;
+    //        }
+    //        else
+    //        {
+    //            return true;
+    //        }
+    //    }
+    //}
 
-    private  List<Producao> CarregarProducoes()
+    public static List<Producao> CarregarProducoes(string caminhoArquivo) // pronta
     {
-        Producoes.Clear();
+        List<Producao> producoes = new List<Producao>();
         try
         {
-            if (ValidarCaminho())
-                foreach (var producao in File.ReadAllLines(CaminhoArquivo))
+            if (Utils.ValidarCaminho(CaminhoArquivo))
+                foreach (var producao in File.ReadAllLines(caminhoArquivo))
                 {
                     var parteid = producao.Substring(0, 5);
                     var parteDataProducao = producao.Substring(5, 10);
@@ -66,103 +63,92 @@ public class Producao
                     var parteQuantidade = producao.Substring(28, 5);
 
                     var id = int.Parse(parteid);
-                    var dataProducao = DateOnly.Parse(parteDataProducao);
+                    var dataProducao = DateTime.Parse(parteDataProducao);
                     var produto = parteProduto;
                     var quantidade = int.Parse(parteQuantidade);
                     var novaproducao = new Producao(id, dataProducao, produto, quantidade);
-                    Producoes.Add(novaproducao);
+                    producoes.Add(novaproducao);
                 }
         }
         catch (Exception e)
         {
             Console.WriteLine($"Ocorreu um erro ao carregar as produções: {e.Message}");
         }
-        return Producoes;
+        return producoes;
     }
-    private void SalvarArquivo()
+    private void SalvarArquivoProducao(List<Producao> producoes)
     {
         try
         {
             using (var sw = new StreamWriter(CaminhoArquivo))
             {
-                foreach (var producao in Producoes)
+                foreach (var producao in producoes)
                 {
                     sw.WriteLine(producao.StringParaArquivo());
                 }
             }
         }
-        catch 
+        catch
         {
-            throw new Exception ($"Ocorreu um erro ao salvar os contatos");
+            throw new Exception($"Ocorreu um erro ao salvar os contatos");
         }
     }
 
-    public  Producao? CadastrarProducao()
+    public Producao? CadastrarProducao(List<Producao> producoes, string produtoId, int quantidade)//pronto
     {
-       
-        CarregarProducoes();
-        Producao producao = null;
         try
         {
-            string produto = string.Empty;
-            int quantidade = 0;
-
-            while (string.IsNullOrEmpty(produto) || produto.Length > 13 )
+            int id = producoes[-1].Id;
+            id++;
+            if (id > 99999)
             {
-                Console.Write("Informe o código de barras do produto: ");
-                produto = Console.ReadLine();
+                throw new Exception("Não é possivel gerar mais Produções");
             }
-            bool converteu = false;
-            while (!converteu || quantidade <= 0 || quantidade > 99999)
+            if (quantidade <= 0 || quantidade > 99999)
             {
-                Console.Write("Informe a quantidade de produto a ser produzido(Max:99,999): ");
-                 converteu = int.TryParse((Console.ReadLine()), out quantidade);
+                throw new Exception("Quantidade deve ser maior que zero e menor que 99999");
+
             }
 
-            producao = new Producao(produto, quantidade);
-            Producoes.Add(producao);
+            Producao producao = new Producao(id, produtoId, quantidade);
+            // CriarItemProducao(id);
+            return producao;
         }
         catch
         {
             throw new Exception("Ocorreu um erro ao criar a Produção.");
         }
-        SalvarArquivo();
-        return producao;
+
     }
 
-    public Producao? Localizar(int id)
+    public int Localizar(List<Producao> producoes, int id)//pronta
     {
-        CarregarProducoes();
-        foreach (Producao producao in Producoes)
+        for (int i = 0; i < producoes.Count; i++)
         {
-            if (producao.Id == id)
+            if (producoes[i].Id == id)
             {
-                return producao;
+                return i;
             }
         }
-        return null;
+        return -1;
     }
 
-    public bool Excluir(int id)
+    public bool Excluir(List<Producao> producoes, int id)
     {
-        foreach (Producao producao in Producoes)
+        try
         {
-            if (producao.Id == id)
-            {
-                try
-                {
-                    Producoes.Remove(producao);
-                    SalvarArquivo();
-                    return true;
-                }
-                catch
-                {
-                    throw new Exception("Ocorreu um erro ao excluir a produção!");
-                }
-            }
+            int indice = Localizar(producoes, id);
+
+            producoes.RemoveAt(indice);
+            return true;
         }
-        throw new Exception("Erro ao procurar produção a ser excluida!");
+        catch
+        {
+            throw new Exception("Ocorreu um erro ao excluir a produção!");
+        }
     }
+
+
 
     //void ImpressaoPorRegistro(List<Producao> producoes)
     //{
@@ -220,11 +206,10 @@ public class Producao
         string dataProducao = DataProducao.ToString();
         string quantidade = Quantidade.ToString();
 
-        return  id.PadRight(5) 
-            + dataProducao.PadRight(10) 
-            + Produto.PadRight(13) 
+        return id.PadRight(5)
+            + dataProducao.PadRight(10)
+            + Produto.PadRight(13)
             + quantidade.PadRight(5); ;
     }
-
 
 }
