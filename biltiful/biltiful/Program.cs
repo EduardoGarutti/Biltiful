@@ -7,4 +7,7 @@
 
 //Console.WriteLine( Produto.LocalizarProduto(Produto.CarregarProdutos(), "7897890764364")); // teste de busca de produto por codigo de barras
 
-//Produto.CarregarProdutos();
+Console.WriteLine( Produto.CarregarProdutos());
+
+
+MateriaPrima.CadastrarMateriaPrima(MateriaPrima.CarregarMateriaPrima(), "materia prima teste", "MP8540");

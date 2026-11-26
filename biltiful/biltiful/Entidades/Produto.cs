@@ -8,7 +8,7 @@ public class Produto
     public double ValorVenda { get; private set; }
     public DateOnly UltimaVenda { get; private set; }
     public DateOnly DataCadastro { get; private set; }
-    public ESituacao Situacao { get; private set; }
+    public char Situacao { get; private set; }
     //public int QtdDisponivel { get; set; } 
 
     private static readonly CultureInfo ptBR = new CultureInfo("pt-BR"); //pedi pro amigão para poder formatar com 000,00
@@ -27,7 +27,7 @@ public class Produto
         SetValor(valor);
         DataCadastro = DateOnly.FromDateTime(DateTime.Now);
         UltimaVenda = DataCadastro;
-        Situacao = ESituacao.Ativo;
+        Situacao = (char)ESituacao.Ativo;
         
     }
 
@@ -47,7 +47,7 @@ public class Produto
             p.CodigoBarras = linha.Substring(26, 13);
             p.DataCadastro = DateOnly.Parse(linha.Substring(39, 10));
             p.UltimaVenda = DateOnly.Parse(linha.Substring(49, 10));
-            p.Situacao = Enum.Parse<ESituacao>(linha.Substring(59, 1));
+            p.Situacao = char.Parse(linha.Substring(59, 1));
 
             lista.Add(p);
 
@@ -64,7 +64,7 @@ public class Produto
         var lista = CarregarProdutos();
         foreach (var item in lista)
         {
-            if (item.Situacao == ESituacao.Ativo)
+            if (item.Situacao == (char)ESituacao.Ativo)
             {
                 listaAtivos.Add(item);
             }
@@ -81,7 +81,7 @@ public class Produto
         var lista = CarregarProdutos();
         foreach (var item in lista)
         {
-            if(item.Situacao == ESituacao.Inativo)
+            if(item.Situacao == (char)ESituacao.Inativo)
             {
                 listaInativos.Add(item);
             }
@@ -153,13 +153,13 @@ public class Produto
             if(item.CodigoBarras == codigoBarras)
             {
 
-                if(Situacao == ESituacao.Ativo)
+                if(Situacao == (char)ESituacao.Ativo)
                 {
-                    Situacao = ESituacao.Inativo;
+                    Situacao = (char)ESituacao.Inativo;
                 }
                 else
                 {
-                    Situacao = ESituacao.Ativo;
+                    Situacao = (char)ESituacao.Ativo;
                 }
             }
         }
