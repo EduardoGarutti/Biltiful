@@ -467,4 +467,49 @@ void Consultar<T>(List<T> lista)
         Console.WriteLine(lista[controle]);
     }
 }
+void MenuVendas()
+{
+    try
+    {
+        Console.WriteLine("Informe o CPF do cliente que deseja realizar uma venda: ");
+        string cpf = Console.ReadLine();
 
+        Cliente aux;
+        ExisteCPF(cpf, aux);
+
+        isMenorIdade(aux);
+
+    }
+    
+
+
+}
+
+void ExisteCPF(string cpf, Cliente aux)
+{
+    foreach (var cliente in clientes)
+    {
+        if (cliente.CPF.Equals(cpf))
+        {
+            aux = cliente;
+            return;
+        }
+    }
+    throw new Exception("Cpf não encontrado na lista!");
+}
+void isMenorIdade(Cliente aux)
+{
+    DateTime hoje = DateTime.Now;
+
+    int idade = hoje.Year - aux.dataNasc.Year;
+
+    if (aux.dataNasc.Date > hoje.AddYears(-idade).Date) //verifica se o cliente fez aniversário nesse ano ou não
+    {
+        idade--;
+    }
+
+    if (idade < 18)
+    {
+        throw new Exception("Cliente menor de idade!");
+    }
+}
