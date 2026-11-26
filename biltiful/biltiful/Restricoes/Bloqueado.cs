@@ -1,11 +1,24 @@
-﻿class Bloqueados : Banidos
+﻿public class Bloqueados : Banidos
 {
     public string Arquivo { get; private set; } = @"C:/Aula/bloqueados.dat";
+
+   public List<string> CarregarArquivo(string arquivo)
+    {
+        try
+        {
+            return base.CarregarArquivo(arquivo);
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
+
     public bool Cadastrar(string cnpf)
     {
         try
         {
-            base.Cadastrar(cnpf, this.Arquivo);
             return true;
         }
         catch
@@ -15,13 +28,14 @@
         }
     }
 
-    public bool Localizar(string cnpf) {
-
+    public bool Localizar(List<string> lista, string cnpf)
+    {
         try
         {
-            return base.Localizar(cnpf, this.Arquivo);
+
+            return base.Localizar(lista, cnpf);
         }
-        catch(Exception ex) 
+        catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
             return false;
@@ -29,12 +43,11 @@
 
     }
 
-    public bool Remover(string cnpf)
+    public bool Remover(List<string> lista, string cnpj)
     {
         try
         {
-            base.Remover(cnpf, this.Arquivo);
-            return true;
+            return base.Remover(lista, cnpj, )
         }
         catch (Exception ex)
         {

@@ -1,5 +1,5 @@
 ﻿
-abstract class Banidos
+public abstract class Banidos
 {
     public List<string> CarregarArquivo(string arquivo)
     {
@@ -41,7 +41,7 @@ abstract class Banidos
 
     }
 
-    public static bool Localizar(List<string> lista, string id)
+    public  bool Localizar(List<string> lista, string id)
     {
         try
         {
