@@ -150,9 +150,10 @@ public class ItemCompra
     // Método auxiliar que valida o formato MP0000.
     private static void ValidarMateriaPrimaId(string materiaPrimaId)
     {
-        //Regex obtida atraves do chatGPT 
+        //Regex obtida via chatGPT
+        //\z, garantindo o fim absoluto da string
         if (string.IsNullOrWhiteSpace(materiaPrimaId) ||
-            !Regex.IsMatch(materiaPrimaId, @"^MP[0-9]{4}$"))
+            !Regex.IsMatch(materiaPrimaId, @"^MP[0-9]{4}\z"))
         {
             throw new ArgumentException(
                 "Identificador da matéria-prima inválido.");
