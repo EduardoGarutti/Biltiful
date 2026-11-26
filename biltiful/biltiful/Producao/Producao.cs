@@ -1,6 +1,6 @@
 ﻿public class Producao
 {
-    public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Produto.dat"));
+    public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Producao.dat"));
     public static int Contador = 1;
     public int Id { get; private set; } //99.999 5 dig
     public DateTime DataProducao { get; private set; } //dd/mm/yyyy
@@ -33,29 +33,14 @@
         Quantidade = quantidade;
     }
 
-    //private bool ValidarCaminho()
-    //{
-    //    if (true)//vai ser a verificacao do utils se a pasta existe
-    //    {
-    //        if (!File.Exists(CaminhoArquivo))
-    //        {
-    //            File.Create(CaminhoArquivo).Close();
-    //            return true;
-    //        }
-    //        else
-    //        {
-    //            return true;
-    //        }
-    //    }
-    //}
 
-    public static List<Producao> CarregarProducoes(string caminhoArquivo) // pronta
+    public static List<Producao> CarregarProducoes() 
     {
         List<Producao> producoes = new List<Producao>();
         try
         {
             if (Utils.ValidarCaminho(CaminhoArquivo))
-                foreach (var producao in File.ReadAllLines(caminhoArquivo))
+                foreach (var producao in File.ReadAllLines(CaminhoArquivo))
                 {
                     var parteid = producao.Substring(0, 5);
                     var parteDataProducao = producao.Substring(5, 10);
@@ -76,7 +61,8 @@
         }
         return producoes;
     }
-    private void SalvarArquivoProducao(List<Producao> producoes)
+
+    public static void SalvarArquivoProducao(List<Producao> producoes)
     {
         try
         {
@@ -90,16 +76,24 @@
         }
         catch
         {
-            throw new Exception($"Ocorreu um erro ao salvar os contatos");
+            throw new Exception($"Ocorreu um erro ao salvar as Produções");
         }
     }
 
-    public Producao? CadastrarProducao(List<Producao> producoes, string produtoId, int quantidade)//pronto
+    public static (Producao?,List<ItemProducao> itensProducao) CadastrarProducao(List<Producao> producoes, string produtoId, int quantidade,string materiaPrimaId,int quantidadeMateriaPrima)
     {
         try
         {
-            int id = producoes[-1].Id;
-            id++;
+            int id = 1;
+
+            foreach (Producao producao in producoes)
+            {
+                if (producao.Id >= id)
+                {
+                    id = producao.Id + 1;
+                }
+            }
+
             if (id > 99999)
             {
                 throw new Exception("Não é possivel gerar mais Produções");
@@ -107,12 +101,12 @@
             if (quantidade <= 0 || quantidade > 99999)
             {
                 throw new Exception("Quantidade deve ser maior que zero e menor que 99999");
-
             }
-
             Producao producao = new Producao(id, produtoId, quantidade);
-            // CriarItemProducao(id);
-            return producao;
+
+            var itensProducao =ItemProducao.CadastrarItemProducao(producao,materiaPrimaId, quantidadeMateriaPrima, quantidade);
+
+            return (producao, itensProducao);
         }
         catch
         {
@@ -121,7 +115,7 @@
 
     }
 
-    public int Localizar(List<Producao> producoes, int id)//pronta
+    public int LocalizarProducao(List<Producao> producoes, int id)
     {
         for (int i = 0; i < producoes.Count; i++)
         {
@@ -133,13 +127,18 @@
         return -1;
     }
 
-    public bool Excluir(List<Producao> producoes, int id)
+    public bool ExcluirProducao(List<ItemProducao> itensProducao,List<Producao> producoes, int id)
     {
         try
         {
-            int indice = Localizar(producoes, id);
+            int indice = LocalizarProducao(producoes, id);
+
+            if (indice == -1)
+                throw new Exception("Produção não encontrada!");
 
             producoes.RemoveAt(indice);
+            ItemProducao.ExcluirItemProducao(itensProducao, id);
+            SalvarArquivoProducao(producoes);
             return true;
         }
         catch
@@ -148,62 +147,60 @@
         }
     }
 
+    public void ImpressaoPorRegistro(List<Producao> producoes)
+    {
+        if (producoes.Count.Equals(0))
+        {
+            Console.WriteLine("Nenhuma Produção encontrado!");
+            Console.ReadKey();
+            return;
+        }
 
+        int indice = 0;
+        bool mostrando = true;
 
-    //void ImpressaoPorRegistro(List<Producao> producoes)
-    //{
-    //    if (producoes.Count.Equals(0))
-    //    {
-    //        Console.WriteLine("Nenhum contato encontrado!");
-    //        Console.ReadKey();
-    //        return;
-    //    }
+        while (mostrando)
+        {
+            var opcoes = new List<string> { "1 - Primeiro ", "2 - Anterior ", "3 - Próximo ", "4 - Último ", "0 - Sair\n" };
 
-    //    int indice = 0;
-    //    bool mostrando = true;
+            Console.Clear();
+            Console.WriteLine($"Item {indice + 1} de {producoes.Count}");
+            Console.WriteLine(producoes[indice] + "\n");
 
-    //    while (mostrando)
-    //    {
-    //        var opcoes = new List<string> { "1 - Primeiro ", "2 - Anterior ", "3 - Próximo ", "4 - Último ", "0 - Sair\n" };
+            switch (Utils.CriarMenu(opcoes))
+            {
+                case '1':
+                    indice = 0;
+                    break;
 
-    //        Console.Clear();
-    //        Console.WriteLine($"Item {indice + 1} de {producoes.Count}");
-    //        Console.WriteLine(producoes[indice] + "\n");
+                case '2':
+                    if (indice > 0) indice--;
+                    break;
 
-    //        switch (Utils.CriarMenu(opcoes))
-    //        {
-    //            case '1':
-    //                indice = 0;
-    //                break;
+                case '3':
+                    if (indice < producoes.Count - 1) indice++;
+                    break;
 
-    //            case '2':
-    //                if (indice > 0) indice--;
-    //                break;
+                case '4':
+                    indice = producoes.Count - 1;
+                    break;
 
-    //            case '3':
-    //                if (indice < producoes.Count - 1) indice++;
-    //                break;
+                case '0':
+                    mostrando = false;
+                    break;
 
-    //            case '4':
-    //                indice = producoes.Count - 1;
-    //                break;
+                default:
+                    Console.WriteLine("Opção inválida!");
+                    break;
+            }
 
-    //            case '0':
-    //                mostrando = false;
-    //                break;
-
-    //            default:
-    //                Console.WriteLine("Opção inválida!");
-    //                break;
-    //        }
-
-    //    }
-    //}
+        }
+    }
 
     public string StringParaArquivo()
     {
         var id = Id.ToString();
-        string dataProducao = DataProducao.ToString();
+        string dataProducao = DataProducao.ToString("dd/MM/yyyy");
         string quantidade = Quantidade.ToString();
 
         return id.PadRight(5)
