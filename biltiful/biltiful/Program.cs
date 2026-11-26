@@ -153,15 +153,15 @@ void CadastrarCliente()
             }
         }
 
-         clientes.Add(Cliente.CadastrarCliente(clientes, cpf, nome, dataNasc, sexo));
+        clientes.Add(Cliente.CadastrarCliente(clientes, cpf, nome, dataNasc, sexo));
     }
     catch (Exception e)
     {
         Console.WriteLine("Erro: " + e.Message);
         if (TentarNovamente())
         {
-        Console.WriteLine("Reiniciando Processo de Cadastro...");
-        CadastrarCliente();
+            Console.WriteLine("Reiniciando Processo de Cadastro...");
+            CadastrarCliente();
         }
     }
 }
@@ -196,7 +196,7 @@ void CadastrarFornecedor()
             entrada = Console.ReadLine();
         }
 
-        
+
 
         fornecedores.Add(Fornecedor.CadastrarFornecedor(fornecedores, cnpj, razaoSocial, dataAbertura));
     }
@@ -205,8 +205,8 @@ void CadastrarFornecedor()
         Console.WriteLine("Erro: " + e.Message);
         if (TentarNovamente())
         {
-        Console.WriteLine("Reiniciando Processo de Cadastro...");
-        CadastrarFornecedor();
+            Console.WriteLine("Reiniciando Processo de Cadastro...");
+            CadastrarFornecedor();
         }
     }
 }
@@ -232,7 +232,7 @@ void CadastrarProduto()
         Console.WriteLine("Informe Valor da venda:");
         decimal valorVenda = decimal.Parse(Console.ReadLine());
 
-        while(valorVenda is > (decimal)999.99 or <= 0)
+        while (valorVenda is > (decimal)999.99 or <= 0)
         {
             Console.WriteLine("Valor de venda Invalido! Informe novamente: ");
             valorVenda = decimal.Parse(Console.ReadLine());
@@ -245,8 +245,8 @@ void CadastrarProduto()
         Console.WriteLine("Erro: " + e.Message);
         if (TentarNovamente())
         {
-        Console.WriteLine("Reiniciando Processo de Cadastro...");
-        CadastrarProduto();
+            Console.WriteLine("Reiniciando Processo de Cadastro...");
+            CadastrarProduto();
         }
     }
 
@@ -261,7 +261,7 @@ void CadastrarMateriaPrima()
 
         materiasPrimas.Add(MateriaPrima.CadastrarMateriaPrima(nomeMateriaPrima));
     }
-    catch(Exception e)
+    catch (Exception e)
     {
         Console.WriteLine("Erro: " + e.Message);
         if (TentarNovamente())
@@ -285,10 +285,10 @@ void CadastrarInadimplente()
             cpf = Regex.Replace(cpf, @"[^a-zA-Z0-9]", "");
         } while (cpf.Length != 11);
 
-        bool existeCliente= false;
-        foreach(var cliente in clientes)
+        bool existeCliente = false;
+        foreach (var cliente in clientes)
         {
-            if(cliente.CPF == cpf)
+            if (cliente.CPF == cpf)
             {
                 existeCliente = true;
             }
@@ -297,11 +297,12 @@ void CadastrarInadimplente()
             Inadimplentes.Cadastrar(inadimplentes, cpf);
         else
             throw new Exception("Esse cpf não existe no nosso cadastro!");
-        
-        
-    } catch(Exception e)
+
+
+    }
+    catch (Exception e)
     {
-        Console.WriteLine("Erro: "+ e.Message);
+        Console.WriteLine("Erro: " + e.Message);
         if (TentarNovamente())
         {
             Console.WriteLine("Reiniciando Processo de Cadastro...");
@@ -348,7 +349,6 @@ void CadastrarBloqueado()
         }
     }
 }
-
 bool TentarNovamente()
 {
     while (true)
@@ -371,3 +371,100 @@ bool TentarNovamente()
         }
     }
 }
+
+void MenuConsultas()
+{
+    while (true)
+    {
+        var escolha = Utils.CriarMenu(new List<string>(){
+        "============CONSULTAS============\n",
+        "[1] - Consultar Cliente\n",
+        "[2] - Consultar Fornecedor\n",
+        "[3] - Consultar Produto\n",
+        "[4] - Consultar Matéria Prima\n",
+        "[5] - Consultar Cliente Inadimplente\n",
+        "[6] - Consultar Fornecedor Bloqueado\n",
+        "[0] - Voltar\n",
+        "================================"
+        });
+
+        switch (escolha)
+        {
+            case '1':
+                Consultar(clientes);
+                break;
+            case '2':
+                Consultar(fornecedores);
+                break;
+            case '3':
+                Consultar(produtos);
+                break;
+            case '4':
+                Consultar(materiasPrimas);
+                break;
+            case '5':
+                Consultar(inadimplentes);
+                break;
+            case '6':
+                Consultar(bloqueados);
+                break;
+            case '0':
+                return;
+            default:
+                Console.WriteLine("Opção Invalida!");
+                break;
+        }
+    }
+}
+void Consultar<T>(List<T> lista)
+{
+    int controle = 0;
+
+    if (lista.Count == 0)
+    {
+        Console.WriteLine("Não existem cadastros!");
+        return;
+    }
+
+    while (true)
+    {
+        var escolha = Utils.CriarMenu(new List<string>(){
+            "============CONSULTAS============\n",
+            "[1] - Primeiro Cadastro\n",
+            "[2] - Próximo Cadastro\n",
+            "[3] - Cadastro Anterior\n",
+            "[4] - Último Cadastro\n",
+            "[0] - Sair\n",
+            "================================"
+        });
+
+        switch (escolha)
+        {
+            case '1':
+                controle = 0;
+                break;
+            case '2':
+                if (controle < lista.Count - 1)
+                    controle++;
+                else
+                    Console.WriteLine("Você já está no último cadastro!");
+                break;
+            case '3':
+                if (controle > 0)
+                    controle--;
+                else
+                    Console.WriteLine("Você já está no primeiro cadastro!");
+                break;
+            case '4':
+                controle = lista.Count - 1;
+                break;
+            case '0':
+                return;
+            default:
+                Console.WriteLine("Opção inválida!");
+                continue;
+        }
+        Console.WriteLine(lista[controle]);
+    }
+}
+
