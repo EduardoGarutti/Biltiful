@@ -9,6 +9,8 @@ List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
 List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
 List<Inadimplentes> inadimplentes = Inadimplentes.CarregarArquivo();
 List<Bloqueados> bloqueados = Bloqueados.CarregarArquivo();
+//--------------------------------------------------------------------------------
+List<Venda> vendas = CarregarVendas("Vendas.dat");
 
 void InicializarPrograma()
 {
@@ -384,6 +386,8 @@ void MenuConsultas()
         "[4] - Consultar Matéria Prima\n",
         "[5] - Consultar Cliente Inadimplente\n",
         "[6] - Consultar Fornecedor Bloqueado\n",
+        "[7] - Consultar Vendas\n",
+        "[8] - Consultar Compras\n",
         "[0] - Voltar\n",
         "================================"
         });
@@ -407,6 +411,12 @@ void MenuConsultas()
                 break;
             case '6':
                 Consultar(bloqueados);
+                break;
+            case '7':
+                Consultar(vendas);
+                break;
+            case '8':
+                Consultar(compras);
                 break;
             case '0':
                 return;
@@ -479,12 +489,20 @@ void MenuVendas()
 
         isMenorIdade(aux);
 
+
+    } catch(Exception e)
+    {
+        Console.WriteLine("Erro: "+e.Message);
+        if (TentarNovamente())
+        {
+            Console.WriteLine("Reiniciando Processo de Venda...");
+            MenuVendas();
+        }
     }
     
 
 
 }
-
 void ExisteCPF(string cpf, Cliente aux)
 {
     foreach (var cliente in clientes)

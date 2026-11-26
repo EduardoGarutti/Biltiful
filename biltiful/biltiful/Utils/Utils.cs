@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using biltiful.Producao;
+using System.Globalization;
 
 public static class Utils
 {
@@ -6,7 +7,7 @@ public static class Utils
     //A produção requisita a compra
     //Função que verifica se tem itens disponiveis para produção
     //Ela recebe um a quantidade de matéria prima necessária e o id da matéria prima, Uma lista de ItemProducao e outra Lista de ItemCompra
-    public static bool QuantidadeDisponivelParaProducao(List<Object> listaItemProducao, double qntMateriaPrimaNecessaria, string idMateriaPrima, List<Object> listaItemCompra)
+    public static bool QuantidadeDisponivelParaProducao(List<ItemProducao> listaItemProducao, double qntMateriaPrimaNecessaria, string idMateriaPrima, List<ItemCompra> listaItemCompra)
     {
         double quantidadeItem = 0;
 

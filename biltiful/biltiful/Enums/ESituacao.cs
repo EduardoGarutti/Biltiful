@@ -1,4 +1,4 @@
-﻿public enum SSituacao
+﻿public enum ESituacao
 {
     I, // Inativo
     A // Ativo
