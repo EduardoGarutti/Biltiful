@@ -1,16 +1,13 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
-
-
-List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
-List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores("Fornecedor.dat");
-List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
-List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
-List<Inadimplentes> inadimplentes = Inadimplentes.CarregarArquivo();
-List<Bloqueados> bloqueados = Bloqueados.CarregarArquivo();
-//--------------------------------------------------------------------------------
+﻿List<Cliente> clientes = Cliente.CarregarClientes();
+List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
+List<Produto> produtos = Produto.CarregarProdutos();
+List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
+List<Banidos> inadimplentes = Inadimplentes.CarregarArquivo();
+List<Banidos> bloqueados = Bloqueados.CarregarArquivo();
+List<Compra> compras = Compra.CarregarCompras("Compra.dat");
 List<Venda> vendas = CarregarVendas("Vendas.dat");
 
+InicializarPrograma();
 void InicializarPrograma()
 {
     while (true)
@@ -173,4 +170,12 @@ void MenuVendas()
             MenuVendas();
         }
     }
+}
+void MenuCompras()
+{
+    Comprar.RealizarCompra(fornecedores, compras, bloqueados, materiasPrimas);
+}
+void MenuProducao()
+{
+
 }
