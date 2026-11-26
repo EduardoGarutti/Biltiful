@@ -1,25 +1,18 @@
-﻿public class Compra : TransacaoComercial
+﻿using System.Globalization;
+
+public class Compra : TransacaoComercial
 {
-    // Armazena o CNPJ do fornecedor associado à compra.
+    // Armazena o CNPJ do fornecedor responsável pela compra.
     public string Fornecedor { get; private set; }
 
-    // Armazena os itens pertencentes à compra.
-    // Lista geral de todas as compras cadastradas.
-    private static List<ItemCompra> Itens { get; set; }
-
-    //Construtor utilizado para uma nova compra, que ainda não possui itens e,
-    //consequentemente, possui valor total igual a zero
+    // Construtor utilizado para cadastrar uma nova compra.
     public Compra(int id, DateTime dataCompra, string fornecedor)
         : base(id, dataCompra)
     {
         Fornecedor = fornecedor;
-
-        // Inicializa uma lista vazia para receber os itens da compra.
-        Itens = new List<ItemCompra>();
     }
 
-    // Construtor utilizado para recuperar uma compra
-    // anteriormente gravada no arquivo Compra.dat.
+    // Construtor utilizado para recuperar uma compra do arquivo.
     public Compra(int id, DateTime dataCompra,
                   string fornecedor, double valorTotal)
         : base(id, dataCompra)
@@ -28,101 +21,25 @@
         ValorTotal = valorTotal;
     }
 
-    // Responsável por adicionar um item à compra.
-    // Retorna true se o item for adicionado com sucesso
-    // ou false caso alguma validação não seja atendida.
-    public bool AdicionarItem(ItemCompra item)
-    {
-        // Verifica se a compra ainda pode receber novos itens.
-        // Caso tenha atingido o limite, interrompe o método.
-        if (!ValidarQuantidadeItens())
-        {
-            return false;
-        }
-
-        // Verifica se o item pertence à compra atual,
-        // comparando seu identificador e sua data.
-        if (!ValidarItem(item))
-        {
-            return false;
-        }
-
-        // Adiciona o item à lista após passar pelas validações.
-        Itens.Add(item);
-
-        // Atualiza o valor total da compra considerando
-        // todos os itens, inclusive o que acabou de ser adicionado.
-        ValorTotal = CalcularValorTotal();
-
-        // Informa que a inclusão foi realizada com sucesso.
-        return true;
-    }
-
-    // Responsável por calcular o valor total da compra,
-    // somando o valor total de cada item presente na lista.
-    public double CalcularValorTotal()
-    {
-        // Variável acumuladora que inicia com zero.
-        double total = 0;
-
-        // Percorre todos os objetos ItemCompra presentes na lista.
-        foreach (ItemCompra item in Itens)
-        {
-            // Soma o valor total do item ao valor acumulado.
-            // O TotalItem é calculado pela própria classe ItemCompra.
-            total += item.TotalItem;
-        }
-
-        // Retorna a soma dos valores de todos os itens.
-        return total;
-    }
-
-    // Verifica se a compra ainda possui espaço para receber um item.
-    // A documentação estabelece o limite máximo de três itens.
-    private bool ValidarQuantidadeItens()
-    {
-        // Retorna true quando existem menos de três itens.
-        // Retorna false quando o limite já foi atingido.
-        return Itens.Count < 3;
-    }
-
-    // Verifica se o item pertence à compra atual.
-    // Evita associar itens de compras diferentes.
-    private bool ValidarItem(ItemCompra item)
-    {
-        // O ID do item deve ser igual ao ID da compra.
-        // A data do item também deve ser igual à data da compra.
-        // Ambas as condições precisam ser verdadeiras.
-        return item.Id == Id && item.DataCompra == Data;
-    }
-
-    // Verifica se a compra atende às condições internas
-    // necessárias para sua finalização.
-    // Este método apenas valida, não realiza a gravação no arquivo.
-    public bool PodeFinalizar()
-    {
-        // A compra deve possuir no mínimo um item.
-        // A compra deve possuir no máximo três itens.
-        // O valor total não pode ultrapassar R$ 99.999,99.
-        return Itens.Count >= 1
-        && Itens.Count <= 3
-        && ValorTotal <= 99999.99;
-    }
-
-    // Retorna o índice da compra pelo ID ou -1 caso não seja encontrada.
+    // Retorna o índice da compra ou -1 caso não seja encontrada.
     public static int LocalizarCompra(List<Compra> compras, int id)
     {
-        for (int i = 0; i < compras.Count; i++) {
-
-            if (compras[i].Id == id) { 
+        for (int i = 0; i < compras.Count; i++)
+        {
+            if (compras[i].Id == id)
+            {
                 return i;
             }
-            
         }
+
         return -1;
     }
 
-    public void ExcluirCompra(List<Compra> compras, List<ItemCompra> itensCompra, int id)
+    // Exclui uma compra e todos os seus respectivos itens.
+    public static void ExcluirCompra(
+        List<Compra> compras,
+        List<ItemCompra> itensCompra,
+        int id)
     {
         int indice = LocalizarCompra(compras, id);
 
@@ -131,31 +48,110 @@
             throw new Exception("Compra não encontrada");
         }
 
-        // Percorre a lista de trás para frente para evitar
-        // problemas com o deslocamento dos índices após a remoção
-        for (int i = itensCompra.Count -1; i>= 0; i--) {
-
+        // Percorre de trás para frente para não ignorar itens
+        // durante a remoção.
+        for (int i = itensCompra.Count - 1; i >= 0; i--)
+        {
             if (itensCompra[i].Id == id)
             {
-                itensCompra.RemoveAt(indice);
+                itensCompra.RemoveAt(i);
             }
         }
 
         compras.RemoveAt(indice);
     }
 
-    
+    // Valida as regras comerciais e retorna uma nova compra.
+    public static Compra CadastrarCompra(
+        List<Compra> compras,
+        string cnpjFornecedor,
+        List<Fornecedor> fornecedores,
+        List<Bloqueados> bloqueados)
+    {
+        Fornecedor fornecedor = BuscarFornecedor(fornecedores, cnpjFornecedor);
 
-    // Gera o próximo identificador com base no maior ID cadastrado
-    // Caso seja 0 garante que o primeiro Id é o primeiro
+        ValidarSituacaoFornecedor(fornecedor);
+
+        ValidarFornecedorBloqueado(bloqueados, cnpjFornecedor);
+
+        DateTime dataCompra = DateTime.Now;
+
+        ValidarDataAbertura(fornecedor, dataCompra);
+
+        int id = GerarId(compras);
+
+        return new Compra(id, dataCompra, cnpjFornecedor);
+    }
+
+    // =====================================================
+    // Métodos auxiliares utilizados no cadastro de compras.XD
+    // =====================================================
+
+    // Método auxiliar responsável por localizar o fornecedor
+    // pelo CNPJ ou lançar uma exceção caso não seja encontrado.
+    private static Fornecedor BuscarFornecedor(
+        List<Fornecedor> fornecedores,
+        string cnpjFornecedor)
+    {
+        foreach (Fornecedor fornecedor in fornecedores)
+        {
+            if (fornecedor.CNPJ == cnpjFornecedor)
+            {
+                return fornecedor;
+            }
+        }
+
+        throw new Exception("Fornecedor não encontrado");
+    }
+
+    // Método auxiliar responsável por verificar se o fornecedor
+    // está ativo e apto a realizar operações comerciais.
+    private static void ValidarSituacaoFornecedor(Fornecedor fornecedor)
+    {
+        if (fornecedor.ESituacao != 'A')
+        {
+            throw new Exception(
+                "Não é possível realizar compras de fornecedores inativos");
+        }
+    }
+
+    // Método auxiliar responsável por verificar se o CNPJ
+    // do fornecedor consta na lista de bloqueados.
+    private static void ValidarFornecedorBloqueado(
+        List<Bloqueados> bloqueados,
+        string cnpjFornecedor)
+    {
+        foreach (Bloqueados bloqueado in bloqueados)
+        {
+            if (bloqueado.CNPJ == cnpjFornecedor)
+            {
+                throw new Exception(
+                    "Fornecedor está bloqueado para realizar operações comerciais");
+            }
+        }
+    }
+
+    // Método auxiliar responsável por validar o tempo mínimo
+    // de seis meses de abertura da empresa.
+    private static void ValidarDataAbertura(
+        Fornecedor fornecedor, DateTime dataCompra)
+    {
+        if (fornecedor.DataAbertura.Date.AddMonths(6) > dataCompra.Date)
+        {
+            throw new Exception(
+                "O fornecedor deve possuir pelo menos seis meses de abertura para realizar vendas à BILTIFUL");
+        }
+    }
+
+    // Método auxiliar responsável por gerar o próximo ID
+    // com base no maior identificador cadastrado.
     private static int GerarId(List<Compra> compras)
     {
         int maiorId = 0;
 
         foreach (Compra compra in compras)
         {
-
-            if (compra.Id == compra.Id)
+            if (compra.Id > maiorId)
             {
                 maiorId = compra.Id;
             }
@@ -165,6 +161,76 @@
         {
             throw new Exception("Limite de identificadores atingido.");
         }
+
         return maiorId + 1;
+    }
+
+    // Grava todas as compras no arquivo com campos de tamanho fixo.
+    public static void GravarNoArquivo(
+        List<Compra> compras, string caminhoArquivo)
+    {
+        using (StreamWriter sw = new StreamWriter(caminhoArquivo))
+        {
+            foreach (Compra compra in compras)
+            {
+                string id = compra.Id.ToString().PadLeft(5);
+
+                string data = compra.Data.ToString("ddMMyyyy");
+
+                string fornecedor = compra.Fornecedor.PadRight(14);
+
+                string valorTotal = compra.ValorTotal
+                    .ToString("F2", CultureInfo.InvariantCulture)
+                    .PadLeft(8);
+
+                string registro = id + data + fornecedor + valorTotal;
+
+                sw.WriteLine(registro);
+            }
+        }
+    }
+
+    // Carrega as compras gravadas no arquivo.
+    public static List<Compra> CarregarCompras(string caminhoArquivo)
+    {
+        List<Compra> compras = new List<Compra>();
+
+        if (!File.Exists(caminhoArquivo))
+        {
+            return compras;
+        }
+
+        using (StreamReader sr = new StreamReader(caminhoArquivo))
+        {
+            string? linha;
+
+            while ((linha = sr.ReadLine()) != null)
+            {
+                if (linha.Length != 35)
+                {
+                    throw new FormatException("Registro de compra inválido.");
+                }
+
+                int id = int.Parse(linha.Substring(0, 5).Trim());
+
+                DateTime dataCompra = DateTime.ParseExact(
+                    linha.Substring(5, 8),
+                    "ddMMyyyy",
+                    CultureInfo.InvariantCulture);
+
+                string fornecedor = linha.Substring(13, 14).Trim();
+
+                double valorTotal = double.Parse(
+                    linha.Substring(27, 8).Trim(),
+                    CultureInfo.InvariantCulture);
+
+                Compra compra = new Compra(
+                    id, dataCompra, fornecedor, valorTotal);
+
+                compras.Add(compra);
+            }
+        }
+
+        return compras;
     }
 }
