@@ -1,4 +1,6 @@
-﻿public static class Utils
+﻿using System.Globalization;
+
+public static class Utils
 {
 
     //A produção requisita a compra
@@ -8,7 +10,7 @@
     {
         double quantidadeComprada = 0;
 
-        foreach(var compra in listaItemCompra)
+        foreach (var compra in listaItemCompra)
         {
             if (compra.MateriaPrima.Equals(idMateriaPrima))
             {
@@ -16,14 +18,14 @@
             }
         }
 
-        if(quantidadeComprada <= 0)
+        if (quantidadeComprada <= 0)
         {
             return false;
         }
 
         double quantidadeGasta = 0;
 
-        foreach(var producao in listaItemProducao)
+        foreach (var producao in listaItemProducao)
         {
             if (producao.MateriaPrima.Equals(idMateriaPrima))
             {
@@ -31,7 +33,7 @@
             }
         }
 
-        if((quantidadeComprada - quantidadeGasta) - qntMateriaPrimaNecessaria < 0)
+        if ((quantidadeComprada - quantidadeGasta) - qntMateriaPrimaNecessaria < 0)
         {
             return false;
         }
@@ -80,6 +82,7 @@
     public static bool ValidarCaminho(string caminhoDoArquivo)
     {
         if (ValidarDats())
+        {
             if (!File.Exists(caminhoDoArquivo))
 
             {
@@ -89,7 +92,9 @@
             else
             {
                 return true;
-            }
+            }   
+        }
         return false;
+
     }
 }
