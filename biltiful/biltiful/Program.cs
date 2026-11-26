@@ -1,8 +1,14 @@
 ﻿using System.Globalization;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 
 List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
+List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores("Fornecedor.dat");
+List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
+List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
+List<Inadimplentes> inadimplentes = Inadimplentes.CarregarArquivo();
+List<Bloqueados> bloqueados = Bloqueados.CarregarArquivo();
 
 void InicializarPrograma()
 {
@@ -56,6 +62,8 @@ void MenuCadastro()
         "[2] - Cadastrar Fornecedor\n",
         "[3] - Cadastrar Produto\n",
         "[4] - Cadastrar Matéria Prima\n",
+        "[5] - Cadastrar Cliente Inadimplente\n",
+        "[6] - Cadastrar Fornecedor Bloqueado\n",
         "[0] - Voltar\n",
         "================================"
         });
@@ -63,7 +71,7 @@ void MenuCadastro()
         switch (escolha)
         {
             case '1':
-                PreencherInformacoesDoCliente();
+                CadastrarCliente();
                 break;
             case '2':
                 CadastrarFornecedor();
@@ -74,6 +82,12 @@ void MenuCadastro()
             case '4':
                 CadastrarMateriaPrima();
                 break;
+            case '5':
+                CadastrarInadimplente();
+                break;
+            case '6':
+                CadastrarBloqueado();
+                break;
             case '0':
                 return;
             default:
@@ -83,7 +97,7 @@ void MenuCadastro()
     }
 }
 
-void PreencherInformacoesDoCliente()
+void CadastrarCliente()
 {
     try
     {
@@ -143,12 +157,217 @@ void PreencherInformacoesDoCliente()
     }
     catch (Exception e)
     {
-        Console.WriteLine(e.Message);
-        PreencherInformacoesDoCliente();
+        Console.WriteLine("Erro: " + e.Message);
+        if (TentarNovamente())
+        {
+        Console.WriteLine("Reiniciando Processo de Cadastro...");
+        CadastrarCliente();
+        }
     }
 }
 
 void CadastrarFornecedor()
 {
+    try
+    {
+        string cnpj;
+        do
+        {
+            Console.WriteLine("Informe CNPJ do Fornecedor: ");
+            cnpj = Console.ReadLine();
 
+            cnpj = Regex.Replace(cnpj, @"[^a-zA-Z0-9]", "");
+        } while (cnpj.Length != 14);
+
+        Console.WriteLine("Informe Razão Social do Fornecedor: ");
+        string razaoSocial = Console.ReadLine();
+
+        string[] formatosDeData = { "dd/MM/yyyy", "ddMMyyyy" };
+        DateTime dataAbertura;
+        string entrada;
+
+        Console.WriteLine("Informe a data de Abertura da empresa: (dd/MM/yyyy)");
+        entrada = Console.ReadLine();
+
+
+        while (!DateTime.TryParseExact(entrada, formatosDeData, CultureInfo.InvariantCulture, DateTimeStyles.None, out dataAbertura))
+        {
+            Console.WriteLine("Data no formato Invalido! informe novamente: ");
+            entrada = Console.ReadLine();
+        }
+
+        
+
+        fornecedores.Add(Fornecedor.CadastrarFornecedor(fornecedores, cnpj, razaoSocial, dataAbertura));
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine("Erro: " + e.Message);
+        if (TentarNovamente())
+        {
+        Console.WriteLine("Reiniciando Processo de Cadastro...");
+        CadastrarFornecedor();
+        }
+    }
+}
+
+void CadastrarProduto()
+{
+    try
+    {
+        string codigoDeBarras;
+        string comecoValido;
+        do
+        {
+            Console.WriteLine("Informe Codigo de Barras do produto(Começando obrigatóriamente com 789): ");
+            codigoDeBarras = Console.ReadLine();
+
+            codigoDeBarras = Regex.Replace(codigoDeBarras, @"[^a-zA-Z0-9]", "");
+            comecoValido = codigoDeBarras.Substring(0, 3);
+        } while (codigoDeBarras.Length != 13 || comecoValido.Equals("789"));
+
+        Console.WriteLine("Informe nome do Produto: ");
+        string nomeProduto = Console.ReadLine();
+
+        Console.WriteLine("Informe Valor da venda:");
+        decimal valorVenda = decimal.Parse(Console.ReadLine());
+
+        while(valorVenda is > (decimal)999.99 or <= 0)
+        {
+            Console.WriteLine("Valor de venda Invalido! Informe novamente: ");
+            valorVenda = decimal.Parse(Console.ReadLine());
+        }
+
+        produtos.Add(Produto.CadastrarProduto(produtos, codigoDeBarras, nomeProduto, valorVenda));
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine("Erro: " + e.Message);
+        if (TentarNovamente())
+        {
+        Console.WriteLine("Reiniciando Processo de Cadastro...");
+        CadastrarProduto();
+        }
+    }
+
+}
+
+void CadastrarMateriaPrima()
+{
+    try
+    {
+        Console.WriteLine("Informe o nome da matéria prima: ");
+        string nomeMateriaPrima = Console.ReadLine();
+
+        materiasPrimas.Add(MateriaPrima.CadastrarMateriaPrima(nomeMateriaPrima));
+    }
+    catch(Exception e)
+    {
+        Console.WriteLine("Erro: " + e.Message);
+        if (TentarNovamente())
+        {
+            Console.WriteLine("Reiniciando Processo de Cadastro...");
+            CadastrarMateriaPrima();
+        }
+    }
+}
+
+void CadastrarInadimplente()
+{
+    try
+    {
+        string cpf;
+        do
+        {
+            Console.WriteLine("Informe CPF do Inadimplente: ");
+            cpf = Console.ReadLine();
+
+            cpf = Regex.Replace(cpf, @"[^a-zA-Z0-9]", "");
+        } while (cpf.Length != 11);
+
+        bool existeCliente= false;
+        foreach(var cliente in clientes)
+        {
+            if(cliente.CPF == cpf)
+            {
+                existeCliente = true;
+            }
+        }
+        if (existeCliente)
+            Inadimplentes.Cadastrar(inadimplentes, cpf);
+        else
+            throw new Exception("Esse cpf não existe no nosso cadastro!");
+        
+        
+    } catch(Exception e)
+    {
+        Console.WriteLine("Erro: "+ e.Message);
+        if (TentarNovamente())
+        {
+            Console.WriteLine("Reiniciando Processo de Cadastro...");
+            CadastrarInadimplente();
+        }
+    }
+}
+
+void CadastrarBloqueado()
+{
+    try
+    {
+        string cnpj;
+        do
+        {
+            Console.WriteLine("Informe CPF do Inadimplente: ");
+            cnpj = Console.ReadLine();
+
+            cnpj = Regex.Replace(cnpj, @"[^a-zA-Z0-9]", "");
+        } while (cnpj.Length != 14);
+
+        bool existeFornecedor = false;
+        foreach (var fornecedor in fornecedores)
+        {
+            if (fornecedor.cnpj == cnpj)
+            {
+                existeFornecedor = true;
+            }
+        }
+        if (existeFornecedor)
+            bloqueados.Cadastrar(bloqueados, cnpj);
+        else
+            throw new Exception("Esse cnpj não existe no nosso cadastro!");
+
+
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine("Erro: " + e.Message);
+        if (TentarNovamente())
+        {
+            Console.WriteLine("Reiniciando Processo de Cadastro...");
+            CadastrarInadimplente();
+        }
+    }
+}
+
+bool TentarNovamente()
+{
+    while (true)
+    {
+        var op = Utils.CriarMenu(new List<string>(){
+            "Deseja tentar o cadastro novamente?\n",
+            "[1] - Sim\n",
+            "[2] - Não"
+    });
+
+        switch (op)
+        {
+            case '1':
+                return true;
+            case '2':
+                return false;
+            default:
+                Console.WriteLine("Opção invalida");
+                break;
+        }
+    }
 }
