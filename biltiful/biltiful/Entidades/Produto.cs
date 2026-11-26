@@ -202,4 +202,17 @@ public class Produto
     }
 
 
+    public override string ToString()
+    {
+        return $"""
+            Nome Matéria-Prima: {Nome}
+            Valor: R$ {ValorVenda}
+            Código de Barras: {CodigoBarras}
+            Data de Cadastro: {DataCadastro}
+            Data da última Venda: {UltimaVenda}
+            Situação: {Situacao}
+            """;
+    }
+
+
 }

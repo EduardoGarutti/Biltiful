@@ -122,6 +122,29 @@
     }
 
 
+    public void AlterarSituacao(string id)
+    {
+        var lista = CarregarMateriaPrima();
+
+        foreach (var item in lista)
+        {
+            if (item.Id == id)
+            {
+
+                if (Situacao == (char)ESituacao.Ativo)
+                {
+                    Situacao = (char)ESituacao.Inativo;
+                }
+                else
+                {
+                    Situacao = (char)ESituacao.Ativo;
+                }
+            }
+        }
+
+
+    }
+
     void SetNome(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))
@@ -144,6 +167,17 @@
     public string ToStringFile()
     {
         return $"{Nome}{Id}{DataCadastro}{UltimaCompra}{Situacao}";
+    }
+
+    public override string ToString()
+    {
+        return $"""
+            Nome Matéria-Prima: {Nome}
+            Id: {Id}
+            Data de Cadastro: {DataCadastro}
+            Data da última Compra: {UltimaCompra}
+            Situação: {Situacao}
+            """;
     }
 
 }
