@@ -1,23 +1,31 @@
 ﻿public class Compra : TransacaoComercial
 {
     // Armazena o CNPJ do fornecedor associado à compra.
-    public string FornecedorId { get; private set; }
+    public string Fornecedor { get; private set; }
 
     // Armazena os itens pertencentes à compra.
-    // O private set impede a substituição da lista por outras classes,
-    // mas não impede a inclusão ou remoção direta de elementos.
-    public List<ItemCompra> Itens { get; private set; }
+    // Lista geral de todas as compras cadastradas.
+    private static List<ItemCompra> Itens { get; set; }
 
-    // Construtor responsável por inicializar o objeto Compra.
-    // Encaminha o ID e a data para o construtor da classe pai
-    // TransacaoComercial através do base().
-    public Compra(int id, DateOnly dataCompra, string fornecedorId)
+    //Construtor utilizado para uma nova compra, que ainda não possui itens e,
+    //consequentemente, possui valor total igual a zero
+    public Compra(int id, DateTime dataCompra, string fornecedor)
         : base(id, dataCompra)
     {
-        FornecedorId = fornecedorId;
+        Fornecedor = fornecedor;
 
         // Inicializa uma lista vazia para receber os itens da compra.
         Itens = new List<ItemCompra>();
+    }
+
+    // Construtor utilizado para recuperar uma compra
+    // anteriormente gravada no arquivo Compra.dat.
+    public Compra(int id, DateTime dataCompra,
+                  string fornecedor, double valorTotal)
+        : base(id, dataCompra)
+    {
+        Fornecedor = fornecedor;
+        ValorTotal = valorTotal;
     }
 
     // Responsável por adicionar um item à compra.
@@ -99,5 +107,64 @@
         return Itens.Count >= 1
         && Itens.Count <= 3
         && ValorTotal <= 99999.99;
+    }
+
+    // Retorna o índice da compra pelo ID ou -1 caso não seja encontrada.
+    public static int LocalizarCompra(List<Compra> compras, int id)
+    {
+        for (int i = 0; i < compras.Count; i++) {
+
+            if (compras[i].Id == id) { 
+                return i;
+            }
+            
+        }
+        return -1;
+    }
+
+    public void ExcluirCompra(List<Compra> compras, List<ItemCompra> itensCompra, int id)
+    {
+        int indice = LocalizarCompra(compras, id);
+
+        if (indice == -1)
+        {
+            throw new Exception("Compra não encontrada");
+        }
+
+        // Percorre a lista de trás para frente para evitar
+        // problemas com o deslocamento dos índices após a remoção
+        for (int i = itensCompra.Count -1; i>= 0; i--) {
+
+            if (itensCompra[i].Id == id)
+            {
+                itensCompra.RemoveAt(indice);
+            }
+        }
+
+        compras.RemoveAt(indice);
+    }
+
+    
+
+    // Gera o próximo identificador com base no maior ID cadastrado
+    // Caso seja 0 garante que o primeiro Id é o primeiro
+    private static int GerarId(List<Compra> compras)
+    {
+        int maiorId = 0;
+
+        foreach (Compra compra in compras)
+        {
+
+            if (compra.Id == compra.Id)
+            {
+                maiorId = compra.Id;
+            }
+        }
+
+        if (maiorId >= 99999)
+        {
+            throw new Exception("Limite de identificadores atingido.");
+        }
+        return maiorId + 1;
     }
 }

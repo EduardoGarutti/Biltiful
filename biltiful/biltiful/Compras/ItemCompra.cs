@@ -19,7 +19,7 @@
 
     //Responsável por combinar partes de um caminho,
     //utilizando os separadores apropriados do sistema operacional
-    private static string CaminhoArquivo = Path.Combine(Utils.CaminhoDats, "Compra.dat");
+    private static string CaminhoArquivo = Path.Combine(Utils.CaminhoDats, "ItemCompra.dat");
 
     // Construtor responsável por validar os parâmetros recebidos
     // antes de atribuí-los às propriedades do objeto.
@@ -100,4 +100,6 @@
     {
         return Math.Round(quantidade * valorUnitario, 2) <= 9999.99;
     }
+
+
 }

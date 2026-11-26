@@ -1,22 +1,13 @@
 ﻿public abstract class TransacaoComercial
 {
     public int Id { get; protected set; }
-    public DateOnly Data { get; protected set; }
+    public DateTime Data { get; protected set; }
     public double ValorTotal { get; protected set; }
 
-    protected TransacaoComercial(int id, DateOnly data)
+    protected TransacaoComercial(int id, DateTime data)
     {
-        if (!ValidarId(id))
-        {
-            throw new ArgumentException("Id inválido.");
-        }
-
         Id = id;
         Data = data;
-    }
-
-    private bool ValidarId(int id)
-    {
-        return id >= 1 && id <= 99999;
+        ValorTotal = 0;
     }
 }
