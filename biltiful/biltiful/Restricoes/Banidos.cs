@@ -1,7 +1,7 @@
 ﻿
-public abstract class Banidos
+public class Banidos
 {
-    public List<string> CarregarArquivo(string arquivo)
+    static public List<string> CarregarArquivo(string arquivo)
     {
         try
         {
@@ -21,11 +21,11 @@ public abstract class Banidos
         }
     }
 
-    public void GravarNoArquivo(List<string> list, string arquivo)
+    static public void GravarNoArquivo(List<string> list, string arquivo)
     {
         try
         {
-            var writer = new StreamWriter(arquivo, true);
+            var writer = new StreamWriter(arquivo);
             foreach (var item in list)
             {
                 writer.WriteLine(item);
@@ -41,16 +41,11 @@ public abstract class Banidos
 
     }
 
-    public  bool Localizar(List<string> lista, string id)
+    static public bool Localizar(List<string> lista, string id)
     {
         try
         {
-            if (lista.Count != 0)
-            {
-                return lista.Exists(x => x.Trim() == id.Trim());
-            }
-
-            return false;
+            return lista.Exists(x => x.Trim() == id.Trim());
         }
         catch
         {
@@ -58,36 +53,37 @@ public abstract class Banidos
         }
 
     }
-    public void Cadastrar(List<string> lista, string id, string arquivo)
+    static public void Cadastrar(List<string> lista, string id, string arquivo)
     {
         try
         {
-            if(!Localizar(lista, id))
+            if(Localizar(lista, id))
             {
-                var writer = new StreamWriter(arquivo, true);
-                writer.WriteLine(id);
-                writer.Close();
-            }
-            else
-            {
+                throw new Exception("Já existe esse registro");
 
             }
+
+            lista.Add(id);
+            GravarNoArquivo(lista, arquivo);
         }
         catch (Exception ex)
         {
-            throw new Exception("Não foi possivel cadastrar banido: /n Possivel Origem:" + ex.Message);
+            throw new Exception("Não foi possivel cadastrar banido");
         }
     }
 
-    public void Remover(List<string> lista, string id, string arquivo)
+    static public void Remover(List<string> lista, string id, string arquivo)
     {
 
         try
         {
-            if (!lista.Remove(id))
+            if (!lista.Remove(id.Trim()))
             {
                 throw new Exception("Banido não encontrado");
             }
+
+            GravarNoArquivo(lista, arquivo);
+
         }
         catch (Exception ex)
         {
