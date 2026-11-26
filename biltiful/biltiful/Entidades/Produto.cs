@@ -8,7 +8,7 @@ public class Produto
     public double ValorVenda { get; private set; }
     public DateOnly UltimaVenda { get; private set; }
     public DateOnly DataCadastro { get; private set; }
-    public char Situacao { get; private set; }
+    public ESituacao Situacao { get; private set; }
     //public int QtdDisponivel { get; set; } 
 
     private static readonly CultureInfo ptBR = new CultureInfo("pt-BR"); //pedi pro amigão para poder formatar com 000,00
@@ -20,18 +20,18 @@ public class Produto
 
     }
 
-    public Produto(string nome, double valor)
+    public Produto(string nome, double valor, string codBarras)
     {
-        CodigoBarras = "789" + Random.Shared.NextInt64(1000000000, 10000000000); // gera um numero aleatorio de 10 digitos e conctena com os outros 3 do comeco
+        CodigoBarras = codBarras;
         SetNome(nome);
         SetValor(valor);
         DataCadastro = DateOnly.FromDateTime(DateTime.Now);
         UltimaVenda = DataCadastro;
-        Situacao = 'A';
+        Situacao = ESituacao.Ativo;
         
     }
 
-    public static List<Produto> CarregarProdutos()
+    public static List<Produto> CarregarProdutos() //retorna todos os produtos, ativos e inativos
     {
 
         List<Produto> lista = new List<Produto>();
@@ -47,7 +47,7 @@ public class Produto
             p.CodigoBarras = linha.Substring(26, 13);
             p.DataCadastro = DateOnly.Parse(linha.Substring(39, 10));
             p.UltimaVenda = DateOnly.Parse(linha.Substring(49, 10));
-            p.Situacao = char.Parse(linha.Substring(59, 1));
+            p.Situacao = Enum.Parse<ESituacao>(linha.Substring(59, 1));
 
             lista.Add(p);
 
@@ -57,28 +57,112 @@ public class Produto
 
     }
 
-    public static Produto CadastrarProduto()
+    public static List<Produto> ProdutoAtivos() // lista todos os produtos Ativos
     {
 
-        Produto produto = null;
-        bool validar;
-        double valor;
-        string nome;
+        var listaAtivos = new List<Produto>();
+        var lista = CarregarProdutos();
+        foreach (var item in lista)
+        {
+            if (item.Situacao == ESituacao.Ativo)
+            {
+                listaAtivos.Add(item);
+            }
+        }
+
+        return listaAtivos;
 
 
-        Console.Write("Informe o nome do produto: ");
-        nome = Console.ReadLine();
-        
+    }
 
-        Console.WriteLine("informe o valor do produto: ");
-        double.TryParse(Console.ReadLine(), out valor);
+    public static List<Produto> ProdutosInativos() //lista todos os produtos Inativos
+    {
+        var listaInativos = new List<Produto>();
+        var lista = CarregarProdutos();
+        foreach (var item in lista)
+        {
+            if(item.Situacao == ESituacao.Inativo)
+            {
+                listaInativos.Add(item);
+            }
+        }
 
-        produto = new Produto(nome, valor);
+        return listaInativos;
+    }
+
+    public static Produto CadastrarProduto(List<Produto> produtos, string codigoBarras, string nome, double valorVenda)
+    {
+
+        foreach(var item in produtos)
+        {
+            if (codigoBarras == item.CodigoBarras)
+                throw new ArgumentException("Ja existe um codigo de barras igual a este");
+        }
+
+
+        var produto = new Produto(nome, valorVenda, codigoBarras);
 
         File.AppendAllText(filePath, produto.ToStringFile() + Environment.NewLine);
 
-        return produto = new Produto(nome, valor);
+        return produto;
 
+
+
+    }
+
+    public static int LocalizarProduto(List<Produto> produtos, string codigoBarras)
+    {
+        foreach(var item in produtos) // percorre a lista e retorna o indice do produto caso encontre um com esse codigo de barras
+        {
+            if(codigoBarras == item.CodigoBarras)
+            {
+                return produtos.IndexOf(item);
+            }
+        }
+
+        return -1; // caso não encontre retorna -1
+    }
+
+    public static Produto EditarProduto(string codigoBarras, string novoNome, double novoValorVenda)
+    {
+        var lista = CarregarProdutos();
+
+        foreach(var item in lista)
+        {
+
+            if (codigoBarras == item.CodigoBarras)
+            {
+                item.Nome = novoNome;
+                item.ValorVenda = novoValorVenda;
+
+                return item;
+            }
+
+        }
+
+        throw new ArgumentException("Produto não encontrado");
+
+    }
+
+    public void AlterarSituacao(string codigoBarras)
+    {
+        var lista = CarregarProdutos(); 
+
+        foreach (var item in lista)
+        {
+            if(item.CodigoBarras == codigoBarras)
+            {
+
+                if(Situacao == ESituacao.Ativo)
+                {
+                    Situacao = ESituacao.Inativo;
+                }
+                else
+                {
+                    Situacao = ESituacao.Ativo;
+                }
+            }
+        }
 
 
     }
@@ -105,8 +189,9 @@ public class Produto
     void SetValor(double valor)
     {
 
-        if (valor <= 0 || valor > 999.99)
-            throw new ArgumentException("valor deve estar entre 0,001 e 999,99");    
+        if (valor <= 0 || valor >= 1000)
+            throw new ArgumentException("valor deve estar entre 0,001 e 999,99");   
+        
             this.ValorVenda = valor;
             
     }
