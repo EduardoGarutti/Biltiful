@@ -1,64 +1,75 @@
 ﻿public class Venda
 {
-    public int Id { get; private set; }
-    public DateOnly Data { get; private set; }
-    public string Cliente { get; private set; }
-    public decimal ValorTotal { get; private set; }
+    public int Id { get; set; }
+    public DateTime Data { get; set; }
+    public string ClienteId { get; set; }
+    public double ValorTotal { get; set; }   
 
-    public Venda(int id, string cliente)
+    public Venda(int id, string data, string clienteId, string valorTotal)
     {
-        if (id < 1 || id > 99999)
-        {
-            throw new ArgumentException("O ID maximo da venda é 99.999.");
-        }
-        if (string.IsNullOrWhiteSpace(cliente) || cliente.Length != 11 || !cliente.All(char.IsDigit))
-        {
-            throw new ArgumentException("O Cpf deve ter exatamente 11 caracteres numéricos.");
-        }
-
-
         Id = id;
-        Data = DateOnly.FromDateTime(DateTime.Now);
-        Cliente = cliente;
-        ValorTotal = 0.0m;
+        Data = DateTime.Parse(data);
+        ClienteId = clienteId;
+        ValorTotal = double.Parse(valorTotal);
     }
-
-    public void CalcularValorTotal(List<ItemVenda> itensVenda)
+    public static List<Venda> CarregarVendas(string caminhoArquivo)
     {
-        if (itensVenda == null || itensVenda.Count < 1 || itensVenda.Count > 3)
+        var vendas = new List<Venda>();
+        try
         {
-            throw new ArgumentException("A venda deve ter de 1 a 3 itens.");
+            if (Utils.ValidarcaminhoArquivo(caminhoArquivo))
+
+                foreach (var venda in File.ReadAllLines(caminhoArquivo))
+                {
+                    var vendaData = venda.Split(',');
+                    if (vendaData.Length.Equals(4))
+                    {
+                        var Id = int.Parse(vendaData[0]);
+                        var data = vendaData[1];
+                        var cliente = vendaData[2];
+                        var valortotal = vendaData[3];
+
+                        var newVenda = new Venda(Id, data, cliente, valortotal);
+                        vendas.Add(newVenda);
+                    }
+                }
+
         }
-        decimal total = 0;
-        foreach (var item in itensVenda)
+        catch (Exception ex)
         {
-            total += item.TotalItem;
+            Console.WriteLine($"Erro ao carregar a venda:{ex.Message}");
         }
-        if (total <= 0 || total > 99999.99m)
-        {
-            throw new ArgumentException("O valor total da venda deve estar entre 0,01 e 99.999,99.");
-        }
-        ValorTotal = total;
+        return vendas;
+
     }
 
-    public Venda(int id, DateOnly data, string cliente, decimal valorTotal)
+    public static Venda CadastrarVenda(List<Cliente> clientes, List<Inadimplentes> inadimplentes, string cpf)
     {
-        if (id < 1 || id > 99999)
+        var cliente = clientes.FirstOrDefault(c => c.CPF == cpf);
+        if (cliente == null)
         {
-            throw new ArgumentException("O ID maximo da venda é 99.999.");
+            Console.WriteLine("Cliente não encontrado.");            
         }
-        if (string.IsNullOrWhiteSpace(cliente) || cliente.Length != 11 || !cliente.All(char.IsDigit))
+        if(inadimplentes.Any(i => i.CPF == cpf))
         {
-            throw new ArgumentException("O Cpf deve ter exatamente 11 caracteres numéricos.");
-        }
-        if (valorTotal <= 0 || valorTotal > 99999.99m)
-        {
-            throw new ArgumentException("O valor maximo da venda é 99.999,99.");
-        }
-        Id = id;
-        Data = data;
-        Cliente = cliente;
-        ValorTotal = valorTotal;
+            Console.WriteLine("Cliente inadimplente:");
+        } 
+        
+       
     }
 
+    public static int LocalizarVenda(List<Venda> vendas, int id)
+    {
+       for (int i = 0; i < vendas.Count; i++)
+        {
+            if (vendas[i].Id == id)
+                return i;
+        }
+        return -1;
+    }
+
+    public void GravarNoArquivo(List<Venda> vendas, string caminhoArquivo)
+    {
+
+    }
 }
