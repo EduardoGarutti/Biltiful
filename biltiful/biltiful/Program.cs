@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
+
 
 List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
 
@@ -85,8 +87,14 @@ void PreencherInformacoesDoCliente()
 {
     try
     {
-        Console.WriteLine("Informe CPF do Cliente: ");
-        string cpf = Console.ReadLine();
+        string cpf;
+        do
+        {
+            Console.WriteLine("Informe CPF do Cliente: ");
+            cpf = Console.ReadLine();
+
+            cpf = Regex.Replace(cpf, @"[^a-zA-Z0-9]", "");
+        } while (cpf.Length != 11);
 
         Console.WriteLine("Informe o nome do Cliente: ");
         string nome = Console.ReadLine();
@@ -138,4 +146,9 @@ void PreencherInformacoesDoCliente()
         Console.WriteLine(e.Message);
         PreencherInformacoesDoCliente();
     }
+}
+
+void CadastrarFornecedor()
+{
+
 }

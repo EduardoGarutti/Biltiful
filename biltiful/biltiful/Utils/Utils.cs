@@ -5,35 +5,38 @@ public static class Utils
 
     //A produção requisita a compra
     //Função que verifica se tem itens disponiveis para produção
-    //Ela recebe um a quantidade de matéria prima necessária e o id da matéria prima 
+    //Ela recebe um a quantidade de matéria prima necessária e o id da matéria prima, Uma lista de ItemProducao e outra Lista de ItemCompra
     public static bool QuantidadeDisponivelParaProducao(List<Object> listaItemProducao, double qntMateriaPrimaNecessaria, string idMateriaPrima, List<Object> listaItemCompra)
     {
-        double quantidadeComprada = 0;
+        double quantidadeItem = 0;
 
         foreach (var compra in listaItemCompra)
         {
-            if (compra.MateriaPrima.Equals(idMateriaPrima))
+            if (compra.MateriaPrima.Equals(idMateriaPrima)) //Percorre a lista de Item Compra.
+                                                            //Caso haja algum item comprado com o mesmo id Requisitado, acrescenta a quantidade em uma variavel de controle
             {
-                quantidadeComprada += compra.Quantidade;
+                quantidadeItem += compra.Quantidade;
             }
         }
 
-        if (quantidadeComprada <= 0)
+        if (quantidadeItem <= 0) //Se a quantidade comprada for menor ou igual a 0, não temos estoque
         {
             return false;
         }
 
-        double quantidadeGasta = 0;
 
-        foreach (var producao in listaItemProducao)
+        foreach (var producao in listaItemProducao) 
         {
-            if (producao.MateriaPrima.Equals(idMateriaPrima))
+            if (producao.MateriaPrima.Equals(idMateriaPrima))//percorre a lista de ItemProducao. 
+                                                             //Se o ID da Materia Prima for igual ao ItemProducao.MateriaPrimaID, siginifica que aquele item foi gasto na producao
+                                                             //Pegamos a quantidade gasta na produção e subtraimos da quantidade comprada, obtendo assim a quantidade de Materia Prima Atual
             {
-                quantidadeGasta += producao.QuantidadeMateriaPrima;
+                quantidadeItem -= producao.QuantidadeMateriaPrima;
             }
         }
 
-        if ((quantidadeComprada - quantidadeGasta) - qntMateriaPrimaNecessaria < 0)
+        if (quantidadeItem - qntMateriaPrimaNecessaria < 0) // Se a quantidade de Item menos da quantidade requisita for menor ou igual a zero,
+                                                            // significa que não temos itens o suficiente
         {
             return false;
         }
@@ -79,6 +82,7 @@ public static class Utils
         }
     }
 
+    //Função que valida se aquele caminho existe
     public static bool ValidarCaminho(string caminhoDoArquivo)
     {
         if (ValidarDats())
