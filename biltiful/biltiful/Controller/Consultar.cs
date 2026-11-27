@@ -1,6 +1,6 @@
 ﻿public class Consultar() 
 {
-    public static void Consultar<T>(List<T> lista)
+    public static void Consulta<T>(List<T> lista)
     {
         int controle = 0;
 
@@ -49,6 +49,13 @@
                     continue;
             }
             Console.WriteLine(lista[controle]);
+        }
+    }
+    public static void Imprimir<T>(List<T> lista)
+    {
+        foreach(var item in lista)
+        {
+            Console.WriteLine(lista);
         }
     }
 }
