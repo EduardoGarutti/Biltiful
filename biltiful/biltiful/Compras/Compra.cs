@@ -271,4 +271,12 @@ public class Compra : TransacaoComercial
 
         return maiorId + 1;
     }
+
+    public override string ToString()
+    {
+        return $"ID: {Id}\n" +
+               $"Data da compra: {Data:dd/MM/yyyy}\n" +
+               $"Fornecedor: {Fornecedor}\n" +
+               $"Valor total: R$ {ValorTotal:F2}";
+    }
 }

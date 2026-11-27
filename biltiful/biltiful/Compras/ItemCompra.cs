@@ -315,4 +315,15 @@ public class ItemCompra
 
         return itensCompra;
     }
+
+    // Retorna uma representação textual dos dados do item.
+    public override string ToString()
+    {
+        return $"ID da compra: {Id}\n" +
+               $"Data da compra: {DataCompra:dd/MM/yyyy}\n" +
+               $"Matéria-prima: {MateriaPrima}\n" +
+               $"Quantidade: {Quantidade:F2}\n" +
+               $"Valor unitário: R$ {ValorUnitario:F2}\n" +
+               $"Total do item: R$ {TotalItem:F2}";
+    }
 }
