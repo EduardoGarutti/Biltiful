@@ -43,17 +43,17 @@
 
     public static bool TemEstoque(List<ItemVenda> itemVenda, int qntRequisitada, List<Producao> producao, int idProduto)
     {
-
+        return true;
     }
     //Função que valida e cria o diretório Dats
-    public static bool ValidarDats()
+    public static bool ValidarData()
     {
         //Concatena caminho + nome do diretório
-        string caminho = AppContext.BaseDirectory + "Dats";
+        string caminho = AppContext.BaseDirectory + "Data";
 
         try
         {
-            //Se o diretório não existe, cria um novo diretório Dats
+            //Se o diretório não existe, cria um novo diretório Data
             if (!Directory.Exists(caminho))
             {
                 Directory.CreateDirectory(caminho);
@@ -87,7 +87,7 @@
     //Função que valida se aquele caminho existe
     public static bool ValidarCaminho(string caminhoDoArquivo)
     {
-        if (ValidarDats())
+        if (ValidarData())
         {
             if (!File.Exists(caminhoDoArquivo))
 

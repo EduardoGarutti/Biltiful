@@ -4,9 +4,9 @@ List<Produto> produtos = Produto.CarregarProdutos();
 List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
 List<Compra> compras = Compra.CarregarCompras();
 
-string pathInadimplentes = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Riscos.dat"));
-string pathBloqueados = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Bloqueados.dat"));
-string pathVendas = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Venda.dat"));
+string pathInadimplentes = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Riscos.dat"));
+string pathBloqueados = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Bloqueados.dat"));
+string pathVendas = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Venda.dat"));
 
 List<string> inadimplentes = Banidos.CarregarArquivo(pathInadimplentes);
 List<string> bloqueados = Banidos.CarregarArquivo(pathBloqueados);

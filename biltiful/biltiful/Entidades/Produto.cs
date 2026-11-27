@@ -13,7 +13,7 @@ public class Produto
 
     private static readonly CultureInfo ptBR = new CultureInfo("pt-BR"); //pedi pro amigão para poder formatar com 000,00
 
-    public static readonly string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "dats", "produto.dat"); //sobe 3 niveis de pasta a partir do do bin do projeto
+    public static readonly string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "produto.dat"); //sobe 3 niveis de pasta a partir do do bin do projeto
 
     public Produto()
     {

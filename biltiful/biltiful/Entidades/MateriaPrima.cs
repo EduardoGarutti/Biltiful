@@ -27,7 +27,7 @@
     }
 
 
-    public static readonly string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "dats", "materiaPrima.dat");
+    public static readonly string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "materiaPrima.dat");
 
 
     public static List<MateriaPrima> CarregarMateriaPrima() //retorna todos as materias primas, ativas e inativas

@@ -1,5 +1,5 @@
-using Biltiful.ConsoleApp.Models;
-namespace Biltiful.ConsoleApp.Repositories;
+using biltiful.Models;
+namespace biltiful.Repositories;
 
 public class UsuarioRepositorio
 {

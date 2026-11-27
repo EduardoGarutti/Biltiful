@@ -1,6 +1,6 @@
-using Biltiful.ConsoleApp.Models;
-using Biltiful.ConsoleApp.Services;
-namespace Biltiful.ConsoleApp.Menus;
+using biltiful.Models;
+using biltiful.Services;
+namespace biltiful.Menus;
 
 public class MenuPrincipal
 {

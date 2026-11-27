@@ -1,4 +1,4 @@
-namespace Biltiful.ConsoleApp.Models;
+namespace biltiful.Models;
 
 public class Usuario
 {

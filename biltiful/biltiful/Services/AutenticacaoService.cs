@@ -1,6 +1,6 @@
-using Biltiful.ConsoleApp.Models;
-using Biltiful.ConsoleApp.Repositories;
-namespace Biltiful.ConsoleApp.Services;
+using biltiful.Models;
+using biltiful.Repositories;
+namespace biltiful.Services;
 
 public class AutenticacaoService
 {

@@ -1,6 +1,6 @@
-using Biltiful.ConsoleApp.Constants;
-using Biltiful.ConsoleApp.Models;
-namespace Biltiful.ConsoleApp.Services;
+using biltiful.Constants;
+using biltiful.Models;
+namespace biltiful.Services;
 
 public class AutorizacaoService
 {

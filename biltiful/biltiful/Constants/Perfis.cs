@@ -1,4 +1,4 @@
-namespace Biltiful.ConsoleApp.Constants;
+namespace biltiful.Constants;
 
 public static class Perfis { 
     public const string Admin = "ADMIN"; 
