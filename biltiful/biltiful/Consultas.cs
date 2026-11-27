@@ -51,5 +51,9 @@
             Console.WriteLine(lista[controle]);
         }
     }
+
+    public static void ImprimirLista(List<Produto> lista) { 
+    
+    }
 }
 
