@@ -13,9 +13,7 @@ public class Cadastrar()
             {
                 Console.WriteLine("Informe CPF do Cliente: ");
                 cpf = Console.ReadLine();
-
-                cpf = Regex.Replace(cpf, @"[^a-zA-Z0-9]", "");
-            } while (cpf.Length != 11);
+            } while (cpf.Length != 14);
 
             Console.WriteLine("Informe o nome do Cliente: ");
             string nome = Console.ReadLine();
