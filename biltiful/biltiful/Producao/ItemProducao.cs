@@ -26,7 +26,7 @@
         QuantidadeMateriaPrima = quantidadeMateriaPrima;
     }
 
-    public static List<ItemProducao> CarregarItemProducoes() 
+    public static List<ItemProducao> CarregarItemProducoes()
     {
         List<ItemProducao> itensProducao = new List<ItemProducao>();
         try
@@ -75,23 +75,12 @@
         }
     }
 
-    public static List<ItemProducao> CadastrarItemProducao(Producao producao,string materiaPrimaId, int quantidadeMateriaPrima,int quantidade)
+    public static ItemProducao CadastrarItemProducao(Producao producao, string materiaPrimaId, int quantidade)
     {
         try
         {
-            List<ItemProducao> itensProducao = new List<ItemProducao>();
-            if (quantidadeMateriaPrima <= 0 || quantidadeMateriaPrima > 99999)
-            {
-                throw new Exception("Quantidade da Materia Prima deve ser maior que zero e menor que 99999");
-
-            }
-            for(int i = 0;i < quantidade;i++)
-            {
-                ItemProducao itemProducao = new ItemProducao(producao,materiaPrimaId, quantidadeMateriaPrima);
-                itensProducao.Add(itemProducao);
-            }
-
-            return itensProducao;
+            ItemProducao itemProducao = new ItemProducao(producao, materiaPrimaId, quantidade);
+            return itemProducao;
         }
         catch (Exception e)
         {
@@ -117,7 +106,7 @@
         try
         {
             int indice = 0;
-            while ((indice = LocalizarItemProducao(itemProducoes,id)) != -1)
+            while ((indice = LocalizarItemProducao(itemProducoes, id)) != -1)
             {
                 itemProducoes.RemoveAt(indice);
             }
