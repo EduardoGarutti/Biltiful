@@ -1,7 +1,4 @@
-﻿using biltiful.Producao;
-using System.Globalization;
-
-public static class Utils
+﻿public static class Utils
 {
 
     //A produção requisita a compra
@@ -44,6 +41,10 @@ public static class Utils
         return true;
     }
 
+    public static bool TemEstoque(List<ItemVenda> itemVenda, int qntRequisitada, List<Producao> producao, int idProduto)
+    {
+
+    }
     //Função que valida e cria o diretório Dats
     public static bool ValidarDats()
     {

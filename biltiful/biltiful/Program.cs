@@ -1,16 +1,11 @@
-﻿using biltiful;
-using System.Globalization;
-using System.Text.RegularExpressions;
-
-
-List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
-List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores("Fornecedor.dat");
-List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
-List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
+﻿List<Cliente> clientes = Cliente.CarregarClientes();
+List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
+List<Produto> produtos = Produto.CarregarProdutos();
+List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
 List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
 List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
 //--------------------------------------------------------------------------------
-List<Venda> vendas = CarregarVendas("Vendas.dat");
+List<Venda> vendas = Vendas.CarregarVendas("Vendas.dat");
 
 void InicializarPrograma()
 {
@@ -39,12 +34,13 @@ void InicializarPrograma()
                 MenuVendas();
                 break;
             case '4':
-                MenuCompras();
+                MenuComprar();
                 break;
             case '5':
                 MenuProducao();
                 break;
             case '0':
+                GravarNoArquivo();
                 Console.WriteLine("Encerrando programa...");
                 Environment.Exit(0);
             default:
@@ -73,22 +69,22 @@ void MenuCadastro()
         switch (escolha)
         {
             case '1':
-                CadastrarCliente();
+                Cadastrar.CadastrarCliente(clientes);
                 break;
             case '2':
-                CadastrarFornecedor();
+                Cadastrar.CadastrarFornecedor(fornecedores);
                 break;
             case '3':
-                CadastrarProduto();
+                Cadastrar.CadastrarProduto(produtos);
                 break;
             case '4':
-                CadastrarMateriaPrima();
+                Cadastrar.CadastrarMateriaPrima(materiasPrimas);
                 break;
             case '5':
-                CadastrarInadimplente();
+                Cadastrar.CadastrarInadimplente(inadimplentes, clientes);
                 break;
             case '6':
-                CadastrarBloqueado();
+                Cadastrar.CadastrarBloqueado(bloqueados, fornecedores);
                 break;
             case '0':
                 return;
@@ -119,28 +115,28 @@ void MenuConsultas()
         switch (escolha)
         {
             case '1':
-                Consultar(clientes);
+                Consultar.Consulta(clientes);
                 break;
             case '2':
-                Consultar(fornecedores);
+                Consultar.Consulta(fornecedores);
                 break;
             case '3':
-                Consultar(produtos);
+                Consultar.Consulta(produtos);
                 break;
             case '4':
-                Consultar(materiasPrimas);
+                Consultar.Consulta(materiasPrimas);
                 break;
             case '5':
-                Consultar(inadimplentes);
+                Consultar.Consulta(inadimplentes);
                 break;
             case '6':
-                Consultar(bloqueados);
+                Consultar.Consulta(bloqueados);
                 break;
             case '7':
-                Consultar(vendas);
+                Consultar.Consulta(vendas);
                 break;
             case '8':
-                Consultar(compras);
+                Consultar.Consulta(compras);
                 break;
             case '0':
                 return;
@@ -180,5 +176,34 @@ void MenuVendas()
     }
 }
 
-    
+void MenuCompras()
+{
+    Comprar.RealizarCompra();
+}
+void MenuProducao()
+{
+
+}
+
+void GravarNoArquivo()
+{
+    try
+    {
+        List<Cliente> clientes = Cliente.CarregarClientes();
+        List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
+        List<Produto> produtos = Produto.CarregarProdutos();
+        List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
+        List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
+        List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
+
+        Cliente.GravarNoArquivo(clientes);
+        Fornecedor.GravarNoArquivo(fornecedores);
+        Produto.GravarNoArquivo(produtos);
+        MateriaPrima.GravarNoArquivo(materiasPrimas);
+        Banidos.GravarNoArquivo(inadimplentes, "risco.dat");
+        Banidos.GravarNoArquivo(bloqueados, "banidos.dat");
+    } catch(Exception e)
+    {
+        Console.WriteLine("Erro ao tentar Salvar os arquivos");
+    }
 }

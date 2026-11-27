@@ -55,7 +55,7 @@
     {
         foreach(var item in lista)
         {
-            Console.WriteLine(lista);
+            Console.WriteLine(lista.ToString());
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 public class Cadastrar()
 {
 
-    void CadastrarCliente<T>(List<T> clientes)
+    public static void CadastrarCliente<T>(List<T> clientes)
     {
         try
         {
@@ -70,38 +70,21 @@ public class Cadastrar()
             }
         }
     }
-
-    void CadastrarFornecedor<T>(List<T> fornecedores)
+    public static void CadastrarFornecedor<T>(List<T> fornecedores)
     {
         try
         {
-            string cnpj;
-            do
-            {
-                Console.WriteLine("Informe CNPJ do Fornecedor: ");
-                cnpj = Console.ReadLine();
 
-                cnpj = Regex.Replace(cnpj, @"[^a-zA-Z0-9]", "");
-            } while (cnpj.Length != 14);
+            Console.WriteLine("Informe CNPJ do Fornecedor: ");
+            string cnpj = Console.ReadLine();
 
             Console.WriteLine("Informe Razão Social do Fornecedor: ");
             string razaoSocial = Console.ReadLine();
 
-            string[] formatosDeData = { "dd/MM/yyyy", "ddMMyyyy" };
-            DateTime dataAbertura;
-            string entrada;
-
             Console.WriteLine("Informe a data de Abertura da empresa: (dd/MM/yyyy)");
-            entrada = Console.ReadLine();
+            string data = Console.ReadLine();
 
-
-            while (!DateTime.TryParseExact(entrada, formatosDeData, CultureInfo.InvariantCulture, DateTimeStyles.None, out dataAbertura))
-            {
-                Console.WriteLine("Data no formato Invalido! informe novamente: ");
-                entrada = Console.ReadLine();
-            }
-
-            fornecedores.Add(Fornecedor.CadastrarFornecedor(fornecedores, cnpj, razaoSocial, dataAbertura));
+            fornecedores.Add(Fornecedor.CadastrarFornecedor(fornecedores, cnpj, razaoSocial, data));
         }
         catch (Exception e)
         {
@@ -113,8 +96,7 @@ public class Cadastrar()
             }
         }
     }
-
-    void CadastrarProduto<T>(List<T> produtos)
+    public static void CadastrarProduto<T>(List<T> produtos)
     {
         try
         {
@@ -154,8 +136,7 @@ public class Cadastrar()
         }
 
     }
-
-    void CadastrarMateriaPrima<T>(List<T> materiasPrimas)
+    public static void CadastrarMateriaPrima<T>(List<T> materiasPrimas)
     {
         try
         {
@@ -174,22 +155,15 @@ public class Cadastrar()
             }
         }
     }
-
-    void CadastrarInadimplente<T>(List<T> inadimplentes, List<T> clientes)
+    public static void CadastrarInadimplente(List<string> inadimplentes, List<Cliente> clientes)
     {
         try
         {
-            string cpf;
-            do
-            {
-                Console.WriteLine("Informe CPF do Inadimplente: ");
-                cpf = Console.ReadLine();
-
-                cpf = Regex.Replace(cpf, @"[^a-zA-Z0-9]", "");
-            } while (cpf.Length != 11);
+            Console.WriteLine("Informe CPF do Inadimplente: ");
+            string cpf = Console.ReadLine();
 
             bool existeCliente = false;
-            foreach (var cliente in clientes)
+            foreach (Cliente cliente in clientes)
             {
                 if (cliente.CPF == cpf)
                 {
@@ -197,11 +171,9 @@ public class Cadastrar()
                 }
             }
             if (existeCliente)
-                Inadimplentes.Cadastrar(inadimplentes, cpf);
+                Banidos.Cadastrar(inadimplentes, cpf, "risco.dat");
             else
                 throw new Exception("Esse cpf não existe no nosso cadastro!");
-
-
         }
         catch (Exception e)
         {
@@ -213,8 +185,7 @@ public class Cadastrar()
             }
         }
     }
-
-    void CadastrarBloqueado<T>(List<T> bloqueados, List<T> fornecedores)
+    public static void CadastrarBloqueado(List<string> bloqueados, List<Fornecedor> fornecedores)
     {
         try
         {
@@ -228,15 +199,15 @@ public class Cadastrar()
             } while (cnpj.Length != 18);
 
             bool existeFornecedor = false;
-            foreach (var fornecedor in fornecedores)
+            foreach (Fornecedor fornecedor in fornecedores)
             {
-                if (fornecedor.cnpj == cnpj)
+                if (fornecedor.CNPJ == cnpj)
                 {
                     existeFornecedor = true;
                 }
             }
             if (existeFornecedor)
-                bloqueados.Cadastrar(bloqueados, cnpj);
+                Banidos.Cadastrar(bloqueados, cnpj, "bloqueados.dat");
             else
                 throw new Exception("Esse cnpj não existe no nosso cadastro!");
 
@@ -252,7 +223,7 @@ public class Cadastrar()
             }
         }
     }
-    void ExisteCPF<T>(string cpf, Cliente aux, List<T> clientes)
+    void ExisteCPF(string cpf, Cliente aux, List<Cliente> clientes)
     {
         foreach (var cliente in clientes)
         {
@@ -263,22 +234,6 @@ public class Cadastrar()
             }
         }
         throw new Exception("Cpf não encontrado na lista!");
-    }
-    void isMenorIdade(Cliente aux)
-    {
-        DateTime hoje = DateTime.Now;
-
-        int idade = hoje.Year - aux.dataNasc.Year;
-
-        if (aux.dataNasc.Date > hoje.AddYears(-idade).Date) //verifica se o cliente fez aniversário nesse ano ou não
-        {
-            idade--;
-        }
-
-        if (idade < 18)
-        {
-            throw new Exception("Cliente menor de idade!");
-        }
     }
 }
 

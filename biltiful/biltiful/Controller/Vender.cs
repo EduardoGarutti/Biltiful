@@ -1,8 +1,8 @@
-﻿namespace biltiful
+﻿namespace biltiful.Controller
 {
-    public class VendasMenu
+    public class Vender
     {
-    
+
         public static void Cadastrar(List<Venda> vendas, List<Cliente> clientes, List<string> inadimplentes)
         {
             try
@@ -12,15 +12,15 @@
                 Venda.CadastrarVenda(vendas, clientes, inadimplentes, cpf);
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
             {
-                    Console.WriteLine("Erro: " + ex.Message);
-               if (Utils.TentarNovamente())
+                Console.WriteLine("Erro: " + ex.Message);
+                if (Utils.TentarNovamente())
                 {
                     Cadastrar(vendas, clientes, inadimplentes);
-                } 
+                }
             }
-        }
+
 
         public static void Localizar(List<Venda> vendas)
         {
