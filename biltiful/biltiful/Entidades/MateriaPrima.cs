@@ -5,21 +5,24 @@
     public string Nome { get; set; }
     public DateOnly UltimaCompra { get; set; }
     public DateOnly DataCadastro { get; set; }
-    public char Situacao { get; set; }
+    public ESituacao Situacao { get; set; }
 
-
+    
     public MateriaPrima()
     {
 
     }
-    public MateriaPrima(string nome, string id)
+    public MateriaPrima(string nome)
     {
-
-        Id = id;
+        do
+        {
+            Id = "MP" + Random.Shared.Next(1000, 9999);
+        } while (LocalizarMateria(CarregarMateriaPrima(), Id) > 0);
+        
         SetNome(nome);
         DataCadastro = DateOnly.FromDateTime(DateTime.Now);
         UltimaCompra = DataCadastro;
-        Situacao = (char)ESituacao.Ativo;
+        Situacao = ESituacao.A;
 
     }
 
@@ -43,7 +46,7 @@
             m.Id = linha.Substring(20, 6);
             m.DataCadastro = DateOnly.Parse(linha.Substring(26, 10));
             m.UltimaCompra = DateOnly.Parse(linha.Substring(36, 10));
-            m.Situacao = char.Parse(linha.Substring(46, 1));
+            m.Situacao = Enum.Parse<ESituacao>(linha.Substring(46, 1));
 
             lista.Add(m);
 
@@ -54,21 +57,17 @@
     }
 
 
-    public static MateriaPrima CadastrarMateriaPrima(List<MateriaPrima> materias, string nome, string id)
+    public static MateriaPrima CadastrarMateriaPrima(List<MateriaPrima> materias, string nome)
     {
 
-        foreach (var materia in materias)
-        {
+        var materiaPrima = new MateriaPrima();
 
-            if (materia.Id == id)
-            {
-                throw new ArgumentException("Matéria ja cadastrada");
-            }
+        materiaPrima = new MateriaPrima(nome);
+        
+            //File.AppendAllText(filePath, materiaPrima.ToStringFile() + Environment.NewLine);
+            //estava lendo o arquivo e salvando o novo elemento no final dele, mas alterei
+            //para o padrão do projeto de salvar em uma lista 
 
-        }
-            var materiaPrima = new MateriaPrima(nome, id);
-
-            File.AppendAllText(filePath, materiaPrima.ToStringFile() + Environment.NewLine);
 
             return materiaPrima;
 
@@ -96,7 +95,7 @@
 
         foreach(var materia in materias)
         {
-            if(materia.Situacao == (char)ESituacao.Ativo)
+            if(materia.Situacao == ESituacao.A)
             {
                 ativas.Add(materia);
             }
@@ -112,7 +111,7 @@
 
         foreach (var materia in materias)
         {
-            if (materia.Situacao == (char)ESituacao.Inativo)
+            if (materia.Situacao == ESituacao.I)
             {
                 ativas.Add(materia);
             }
@@ -121,6 +120,29 @@
         return ativas;
     }
 
+
+    public void AlterarSituacao(string id)
+    {
+        var lista = CarregarMateriaPrima();
+
+        foreach (var item in lista)
+        {
+            if (item.Id == id)
+            {
+
+                if (Situacao == ESituacao.A)
+                {
+                    Situacao = ESituacao.I;
+                }
+                else
+                {
+                    Situacao = ESituacao.A;
+                }
+            }
+        }
+
+
+    }
 
     void SetNome(string nome)
     {
@@ -141,9 +163,38 @@
 
     }
 
+    public static void GravarNoArquivo(List<MateriaPrima> materias)
+    {
+
+        var writer = new StreamWriter(filePath, true);
+        File.WriteAllText(filePath, "");
+        foreach(var materia in materias)
+        {
+            string informacoes = materia.ToStringFile();
+            writer.WriteLine(informacoes);
+        }
+
+        writer.Close();
+
+    }
+
     public string ToStringFile()
     {
         return $"{Nome}{Id}{DataCadastro}{UltimaCompra}{Situacao}";
+    }
+
+
+
+
+    public override string ToString()
+    {
+        return $"""
+            Nome Matéria-Prima: {Nome}
+            Id: {Id}
+            Data de Cadastro: {DataCadastro}
+            Data da última Compra: {UltimaCompra}
+            Situação: {Situacao}
+            """;
     }
 
 }

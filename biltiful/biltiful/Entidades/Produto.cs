@@ -5,10 +5,10 @@ public class Produto
 
     public string CodigoBarras { get; private set; }
     public string Nome { get; private set; }
-    public double ValorVenda { get; private set; }
+    public decimal ValorVenda { get; private set; }
     public DateOnly UltimaVenda { get; private set; }
     public DateOnly DataCadastro { get; private set; }
-    public char Situacao { get; private set; }
+    public ESituacao Situacao { get; private set; }
     //public int QtdDisponivel { get; set; } 
 
     private static readonly CultureInfo ptBR = new CultureInfo("pt-BR"); //pedi pro amigão para poder formatar com 000,00
@@ -20,14 +20,14 @@ public class Produto
 
     }
 
-    public Produto(string nome, double valor, string codBarras)
+    public Produto(string nome, decimal valor, string codBarras)
     {
         CodigoBarras = codBarras;
         SetNome(nome);
         SetValor(valor);
         DataCadastro = DateOnly.FromDateTime(DateTime.Now);
         UltimaVenda = DataCadastro;
-        Situacao = (char)ESituacao.Ativo;
+        Situacao = ESituacao.A;
         
     }
 
@@ -43,11 +43,11 @@ public class Produto
 
             Produto p = new Produto();
             p.Nome = linha.Substring(0, 20);
-            p.ValorVenda = double.Parse(linha.Substring(20, 6));
+            p.ValorVenda = decimal.Parse(linha.Substring(20, 6));
             p.CodigoBarras = linha.Substring(26, 13);
             p.DataCadastro = DateOnly.Parse(linha.Substring(39, 10));
             p.UltimaVenda = DateOnly.Parse(linha.Substring(49, 10));
-            p.Situacao = char.Parse(linha.Substring(59, 1));
+            p.Situacao = Enum.Parse<ESituacao>(linha.Substring(59, 1));
 
             lista.Add(p);
 
@@ -64,7 +64,7 @@ public class Produto
         var lista = CarregarProdutos();
         foreach (var item in lista)
         {
-            if (item.Situacao == (char)ESituacao.Ativo)
+            if (item.Situacao == ESituacao.A)
             {
                 listaAtivos.Add(item);
             }
@@ -81,7 +81,7 @@ public class Produto
         var lista = CarregarProdutos();
         foreach (var item in lista)
         {
-            if(item.Situacao == (char)ESituacao.Inativo)
+            if(item.Situacao == ESituacao.I)
             {
                 listaInativos.Add(item);
             }
@@ -90,7 +90,7 @@ public class Produto
         return listaInativos;
     }
 
-    public static Produto CadastrarProduto(List<Produto> produtos, string codigoBarras, string nome, double valorVenda)
+    public static Produto CadastrarProduto(List<Produto> produtos, string codigoBarras, string nome, decimal valorVenda)
     {
 
         foreach(var item in produtos)
@@ -102,7 +102,7 @@ public class Produto
 
         var produto = new Produto(nome, valorVenda, codigoBarras);
 
-        File.AppendAllText(filePath, produto.ToStringFile() + Environment.NewLine);
+        //File.AppendAllText(filePath, produto.ToStringFile() + Environment.NewLine);
 
         return produto;
 
@@ -123,7 +123,7 @@ public class Produto
         return -1; // caso não encontre retorna -1
     }
 
-    public static Produto EditarProduto(string codigoBarras, string novoNome, double novoValorVenda)
+    public static Produto EditarProduto(string codigoBarras, string novoNome, decimal novoValorVenda)
     {
         var lista = CarregarProdutos();
 
@@ -153,13 +153,13 @@ public class Produto
             if(item.CodigoBarras == codigoBarras)
             {
 
-                if(Situacao == (char)ESituacao.Ativo)
+                if(Situacao == ESituacao.A)
                 {
-                    Situacao = (char)ESituacao.Inativo;
+                    Situacao = ESituacao.I;
                 }
                 else
                 {
-                    Situacao = (char)ESituacao.Ativo;
+                    Situacao = ESituacao.A;
                 }
             }
         }
@@ -186,7 +186,7 @@ public class Produto
 
     }
 
-    void SetValor(double valor)
+    void SetValor(decimal valor)
     {
 
         if (valor <= 0 || valor >= 1000)
@@ -196,9 +196,37 @@ public class Produto
             
     }
 
+    public static void GravarNoArquivo(List<Produto> produtos)
+    {
+
+        var writer = new StreamWriter(filePath, true);
+        File.WriteAllText(filePath, "");
+        foreach (var produto in produtos)
+        {
+            string informacoes = produto.ToStringFile();
+            writer.WriteLine(informacoes);
+        }
+
+        writer.Close();
+
+    }
+
     public string ToStringFile()
     {
         return $"{Nome}{ValorVenda.ToString("000.00", ptBR)}{CodigoBarras}{UltimaVenda}{DataCadastro}{Situacao}";
+    }
+
+
+    public override string ToString()
+    {
+        return $"""
+            Nome Matéria-Prima: {Nome}
+            Valor: R$ {ValorVenda}
+            Código de Barras: {CodigoBarras}
+            Data de Cadastro: {DataCadastro}
+            Data da última Venda: {UltimaVenda}
+            Situação: {Situacao}
+            """;
     }
 
 
