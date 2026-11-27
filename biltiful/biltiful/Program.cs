@@ -8,9 +8,15 @@ string pathInadimplentes = Path.GetFullPath(Path.Combine(AppContext.BaseDirector
 string pathBloqueados = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Bloqueados.dat"));
 string pathVendas = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Venda.dat"));
 
-List<string> inadimplentes = Banidos.CarregarArquivo(pathInadimplentes);
-List<string> bloqueados = Banidos.CarregarArquivo(pathBloqueados);
-List<Venda> vendas = Venda.CarregarVendas(pathVendas);
+List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
+List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores("Fornecedor.dat");
+List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
+List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
+List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
+List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
+//--------------------------------------------------------------------------------
+List<Venda> vendas = CarregarVendas("Vendas.dat");
+
 void InicializarPrograma()
 {
     while (true)
@@ -38,10 +44,10 @@ void InicializarPrograma()
                 MenuVendas();
                 break;
             case '4':
-                MenuComprar();
+                MenuCompras();
                 break;
             case '5':
-                MenuProducao();
+                // MenuProducao();
                 break;
             case '0':
                 GravarNoArquivo();
@@ -74,22 +80,22 @@ void MenuCadastro()
         switch (escolha)
         {
             case '1':
-                Cadastrar.CadastrarCliente(clientes);
+                CadastrarCliente();
                 break;
             case '2':
-                Cadastrar.CadastrarFornecedor(fornecedores);
+                CadastrarFornecedor();
                 break;
             case '3':
-                Cadastrar.CadastrarProduto(produtos);
+                CadastrarProduto();
                 break;
             case '4':
-                Cadastrar.CadastrarMateriaPrima(materiasPrimas);
+                CadastrarMateriaPrima();
                 break;
             case '5':
-                Cadastrar.CadastrarInadimplente(inadimplentes, clientes);
+                CadastrarInadimplente();
                 break;
             case '6':
-                Cadastrar.CadastrarBloqueado(bloqueados, fornecedores);
+                CadastrarBloqueado();
                 break;
             case '0':
                 return;
@@ -120,28 +126,28 @@ void MenuConsultas()
         switch (escolha)
         {
             case '1':
-                Consultar.Consulta(clientes);
+                Consultar(clientes);
                 break;
             case '2':
-                Consultar.Consulta(fornecedores);
+                Consultar(fornecedores);
                 break;
             case '3':
-                Consultar.Consulta(produtos);
+                Consultar(produtos);
                 break;
             case '4':
-                Consultar.Consulta(materiasPrimas);
+                Consultar(materiasPrimas);
                 break;
             case '5':
-                Consultar.Consulta(inadimplentes);
+                Consultar(inadimplentes);
                 break;
             case '6':
-                Consultar.Consulta(bloqueados);
+                Consultar(bloqueados);
                 break;
             case '7':
-                Consultar.Consulta(vendas);
+                Consultar(vendas);
                 break;
             case '8':
-                Consultar.Consulta(compras);
+                Consultar(compras);
                 break;
             case '0':
                 return;
@@ -171,7 +177,7 @@ void MenuVendas()
             biltiful.Controller.Vender.Localizar(vendas);
             break;
         case '3':
-            biltiful.Controller.Vender.Salvar(vendas);
+            VendasMenu.Salvar(vendas);
             break;
         case '0':
             return;
@@ -180,28 +186,10 @@ void MenuVendas()
             break;
     }
 }
-
-void MenuComprar()
+void MenuCompras()
 {
     Comprar.RealizarCompra(fornecedores, compras, bloqueados, materiasPrimas);
 }
-void MenuProducao()
-{
-    Produzir.RealizarProducao();
-}
 
-void GravarNoArquivo()
-{
-    try
-    {
-        Cliente.GravarNoArquivo(clientes);
-        Fornecedor.GravarNoArquivo(fornecedores);
-        Produto.GravarNoArquivo(produtos);
-        MateriaPrima.GravarNoArquivo(materiasPrimas);
-        Banidos.GravarNoArquivo(inadimplentes, "risco.dat");
-        Banidos.GravarNoArquivo(bloqueados, "banidos.dat");
-    } catch(Exception e)
-    {
-        Console.WriteLine("Erro ao tentar Salvar os arquivos");
-    }
+    
 }
