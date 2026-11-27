@@ -174,15 +174,10 @@ public class Produto
 
         if (nome.Length > 20)
         {
-            nome = nome.Substring(0, 20); // subtrai os caracteres restantes no nome se ele passar de 20
+            throw new Exception("nome não pode ultrapassar 20 caracteres");
+        }
 
-            this.Nome = nome;
-        }
-        else
-        {
-            nome = nome.PadRight(20);
-            this.Nome = nome;
-        }
+        Nome = nome;
 
     }
 
@@ -203,7 +198,7 @@ public class Produto
         File.WriteAllText(filePath, "");
         foreach (var produto in produtos)
         {
-            string informacoes = produto.ToStringFile();
+            string informacoes = produto.ToFile();
             writer.WriteLine(informacoes);
         }
 
@@ -211,9 +206,9 @@ public class Produto
 
     }
 
-    public string ToStringFile()
+    public string ToFile()
     {
-        return $"{Nome}{ValorVenda.ToString("000.00", ptBR)}{CodigoBarras}{UltimaVenda}{DataCadastro}{Situacao}";
+        return $"{Nome.PadRight(20)}{ValorVenda.ToString("000.00", ptBR)}{CodigoBarras}{UltimaVenda}{DataCadastro}{Situacao}";
     }
 
 
