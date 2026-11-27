@@ -1,6 +1,7 @@
 ﻿
 public class Banidos
 {
+
     static public List<string> CarregarArquivo(string arquivo)
     {
         try

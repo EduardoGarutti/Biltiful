@@ -64,7 +64,10 @@
 
         materiaPrima = new MateriaPrima(nome);
         
-            File.AppendAllText(filePath, materiaPrima.ToStringFile() + Environment.NewLine);
+            //File.AppendAllText(filePath, materiaPrima.ToStringFile() + Environment.NewLine);
+            //estava lendo o arquivo e salvando o novo elemento no final dele, mas alterei
+            //para o padrão do projeto de salvar em uma lista 
+
 
             return materiaPrima;
 
@@ -148,22 +151,36 @@
 
         if (nome.Length > 20)
         {
-            nome = nome.Substring(0, 20); // subtrai os caracteres restantes no nome se ele passar de 20
+            throw new Exception("nome não pode ultrapassar 20 caracteres");
 
-            this.Nome = nome;
         }
-        else
-        {
-            nome = nome.PadRight(20);
-            this.Nome = nome;
-        }
+
+        Nome = nome;
 
     }
 
-    public string ToStringFile()
+    public static void GravarNoArquivo(List<MateriaPrima> materias)
     {
-        return $"{Nome}{Id}{DataCadastro}{UltimaCompra}{Situacao}";
+
+        var writer = new StreamWriter(filePath, true);
+        File.WriteAllText(filePath, "");
+        foreach(var materia in materias)
+        {
+            string informacoes = materia.ToFile();
+            writer.WriteLine(informacoes);
+        }
+
+        writer.Close();
+
     }
+
+    public string ToFile()
+    {
+        return $"{Nome.PadRight(20)}{Id}{DataCadastro}{UltimaCompra}{Situacao}";
+    }
+
+
+
 
     public override string ToString()
     {
