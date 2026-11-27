@@ -2,6 +2,7 @@
 
 public class Compra : TransacaoComercial
 {
+    public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Compra.dat"));
     // Armazena o CNPJ do fornecedor responsável pela compra.
     public string Fornecedor { get; private set; }
 
@@ -117,18 +118,18 @@ public class Compra : TransacaoComercial
     }
 
     // Carrega as compras gravadas no arquivo.
-    public static List<Compra> CarregarCompras(string caminhoArquivo)
+    public static List<Compra> CarregarCompras()
     {
         // A lista será preenchida com os objetos recuperados do arquivo.
         List<Compra> compras = new List<Compra>();
 
         // Caso o arquivo não exista, retorna uma lista vazia.
-        if (!File.Exists(caminhoArquivo))
+        if (!File.Exists(CaminhoArquivo))
         {
             return compras;
         }
 
-        using (StreamReader sr = new StreamReader(caminhoArquivo))
+        using (StreamReader sr = new StreamReader(CaminhoArquivo))
         {
             string? linha;
 

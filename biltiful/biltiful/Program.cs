@@ -5,7 +5,8 @@ List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
 List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
 List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
 //--------------------------------------------------------------------------------
-List<Venda> vendas = Vendas.CarregarVendas("Vendas.dat");
+List<Venda> vendas = Vendas.CarregarVendas();
+List<Compra> compras = Compra.CarregarCompras();
 
 void InicializarPrograma()
 {
@@ -43,6 +44,7 @@ void InicializarPrograma()
                 GravarNoArquivo();
                 Console.WriteLine("Encerrando programa...");
                 Environment.Exit(0);
+                break;
             default:
                 Console.WriteLine("Opção invalida!");
                 break;
@@ -176,26 +178,19 @@ void MenuVendas()
     }
 }
 
-void MenuCompras()
+void MenuComprar()
 {
     Comprar.RealizarCompra();
 }
 void MenuProducao()
 {
-
+    Produzir.RealizarProducao();
 }
 
 void GravarNoArquivo()
 {
     try
     {
-        List<Cliente> clientes = Cliente.CarregarClientes();
-        List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
-        List<Produto> produtos = Produto.CarregarProdutos();
-        List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
-        List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
-        List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
-
         Cliente.GravarNoArquivo(clientes);
         Fornecedor.GravarNoArquivo(fornecedores);
         Produto.GravarNoArquivo(produtos);
