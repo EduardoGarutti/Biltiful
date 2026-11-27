@@ -23,25 +23,23 @@
 
     public static List<ItemVenda> CarregarItensVenda(string caminhoArquivo)
     {
-        var itensVenda = new List<ItemVenda>();
+        List<ItemVenda> itensVenda = new List<ItemVenda>();
+
         try
         {
             if (Utils.ValidarCaminho(caminhoArquivo))
             {
                 foreach(var item in File.ReadAllLines(caminhoArquivo))
                 {
-                    var itemData = item.Split(',');
-                    if (itemData.Length.Equals(4))
-                    {
-                        var vendaId = int.Parse(itemData[0]);
-                        var produtoId = itemData[1];
-                        var quantidade = int.Parse(itemData[2]);
-                        var valorunitario = itemData[3];
+                    ItemVenda iv = new ItemVenda();
 
-                        var newItemVenda = new ItemVenda(vendaId, produtoId, quantidade, valorunitario);
-                        itensVenda.Add(newItemVenda);
-
-                    }
+                    iv.VendaId = int.Parse(item.Substring(0,5));
+                    iv.ProdutoId = item.Substring(5,18);
+                    iv.Quantidade = int.Parse(item.Substring(18,21));
+                    iv.ValorUnitario = decimal.Parse(item.Substring(21,26));
+                    iv.TotalItem = decimal.Parse(item.Substring(26, 32));
+                    
+                    itensVenda.Add(iv);
                 }
             }
         }
@@ -62,9 +60,9 @@
             {
                 foreach(var produto in produtos)
                 {
-                    if(produto.Id == produtoId)
+                    if(produto.CodigoBarras == produtoId)
                     {
-                        var newItemVenda = new ItemVenda(vendaId, produtoId, quantidade, valorunitario);
+                        var newItemVenda = new ItemVenda(vendaId, produtoId, quantidade, produto.ValorVenda);
                         itensVenda.Add(newItemVenda);
                         return newItemVenda;
                     }
@@ -110,7 +108,7 @@
         {
             if (Utils.ValidarCaminho(caminhoArquivo))
             {
-                using (StreamWriter sw = new StreamWriter(caminhoArquivo))
+                using (var sw = new StreamWriter(caminhoArquivo))
                 {
                     foreach(var item in itemVendas)
                     {
@@ -125,6 +123,11 @@
             throw new ArgumentException($"Erro ao gravar itens: {ex.Message}");
         }
     } 
+
+    public  string ToString(ItemVenda iv)
+    {
+        return $" Venda {iv.VendaId}, Produto {iv.ProdutoId} , Quantidade {iv.Quantidade}, Valor Unitário {iv.ValorUnitario}, Total {iv.TotalItem} ";
+    }
     
 
 }

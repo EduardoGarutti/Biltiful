@@ -191,6 +191,11 @@
             + MateriaPrima.PadRight(6)
             + quantidadeMateriaPrima.PadRight(5);
     }
+
+    public override string ToString()
+    {
+        return $"Id: {Id}\nData Produção: {DataProducao}\nCódigo Matéria Prima: {MateriaPrima}\nQuantidade Matéria Prima: {QuantidadeMateriaPrima}";
+    }
 }
 
 
