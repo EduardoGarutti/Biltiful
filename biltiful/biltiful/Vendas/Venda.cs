@@ -74,7 +74,7 @@
         return -1;
     }
 
-    public void GravarNoArquivo(List<Venda> vendas, string caminhoArquivo)
+    public static void GravarNoArquivo(List<Venda> vendas, string caminhoArquivo)
     {
         try
         {

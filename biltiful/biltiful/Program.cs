@@ -3,14 +3,14 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 
 
-List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
-List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores("Fornecedor.dat");
-List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
-List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
+List<Cliente> clientes = Cliente.CarregarClientes();
+List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
+List<Produto> produtos = Produto.CarregarProdutos();
+List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
 List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
 List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
 //--------------------------------------------------------------------------------
-List<Venda> vendas = CarregarVendas("Vendas.dat");
+List<Venda> vendas = Venda.CarregarVendas("Vendas.dat");
 
 void InicializarPrograma()
 {
@@ -39,14 +39,15 @@ void InicializarPrograma()
                 MenuVendas();
                 break;
             case '4':
-                MenuCompras();
+                //MenuCompras();
                 break;
             case '5':
-                MenuProducao();
+                // MenuProducao();
                 break;
             case '0':
                 Console.WriteLine("Encerrando programa...");
                 Environment.Exit(0);
+                break;
             default:
                 Console.WriteLine("Opção invalida!");
                 break;
@@ -73,22 +74,22 @@ void MenuCadastro()
         switch (escolha)
         {
             case '1':
-                CadastrarCliente();
+                // CadastrarCliente();
                 break;
             case '2':
-                CadastrarFornecedor();
+                // CadastrarFornecedor();
                 break;
             case '3':
-                CadastrarProduto();
+                // CadastrarProduto();
                 break;
             case '4':
-                CadastrarMateriaPrima();
+                //CadastrarMateriaPrima();
                 break;
             case '5':
-                CadastrarInadimplente();
+                //CadastrarInadimplente();
                 break;
             case '6':
-                CadastrarBloqueado();
+                //CadastrarBloqueado();
                 break;
             case '0':
                 return;
@@ -119,28 +120,28 @@ void MenuConsultas()
         switch (escolha)
         {
             case '1':
-                Consultar(clientes);
+                //Consultar(clientes);
                 break;
             case '2':
-                Consultar(fornecedores);
+                // Consultar(fornecedores);
                 break;
             case '3':
-                Consultar(produtos);
+                //Consultar(produtos);
                 break;
             case '4':
-                Consultar(materiasPrimas);
+                //Consultar(materiasPrimas);
                 break;
             case '5':
-                Consultar(inadimplentes);
+                //Consultar(inadimplentes);
                 break;
             case '6':
-                Consultar(bloqueados);
+                //Consultar(bloqueados);
                 break;
             case '7':
-                Consultar(vendas);
+                //Consultar(vendas);
                 break;
             case '8':
-                Consultar(compras);
+                //Consultar(compras);
                 break;
             case '0':
                 return;
@@ -170,7 +171,7 @@ void MenuVendas()
             VendasMenu.Localizar(vendas);
             break;
         case '3':
-            VendasMenu.Salvar(vendas);
+            VendasMenu.Salvar(vendas, "Vendas.dat");
             break;
         case '0':
             return;
@@ -181,4 +182,3 @@ void MenuVendas()
 }
 
     
-}
