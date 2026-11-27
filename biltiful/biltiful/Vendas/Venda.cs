@@ -19,24 +19,22 @@
     }
     public static List<Venda> CarregarVendas(string caminhoArquivo)
     {
-        var vendas = new List<Venda>();
+        List<Venda> vendas = new List<Venda>();
+        
         try
         {
             if (Utils.ValidarCaminho(caminhoArquivo))
 
                 foreach (var venda in File.ReadAllLines(caminhoArquivo))
                 {
-                    var vendaData = venda.Split(',');
-                    if (vendaData.Length.Equals(4))
-                    {
-                        var Id = int.Parse(vendaData[0]);
-                        var data = vendaData[1];
-                        var cliente = vendaData[2];
-                        var valortotal = vendaData[3];
+                    Venda  v = new Venda();
 
-                        var newVenda = new Venda(Id, data, cliente, valortotal);
-                        vendas.Add(newVenda);
-                    }
+                    v.Id = int.Parse(venda.Substring(0,5));
+                    v.Data = DateTime.Parse(venda.Substring(5, 13));
+                    v.ClienteId = venda.Substring(13, 24);
+                    v.ValorTotal = decimal.Parse(venda.Substring(24, 31));
+                   
+                    vendas.Add(v);                    
                 }
 
         }
@@ -47,19 +45,14 @@
         return vendas;
 
     }
-
-    public bool ValidarDatanas()
-    {
-        return true;
-    }
-
+   
     public static Venda CadastrarVenda(List<Cliente> clientes, string cpf, decimal valor)
     {
        foreach(var cliente in clientes)
         {
             if(cliente.CPF == cpf)
             {
-               if(!ValidarDatanas())
+               if(Cliente.EhMenorDeIdade(cliente))
                 {
                     throw new ArgumentException("Cliente menor de idade");
                 }
@@ -87,11 +80,11 @@
         {
             if (Utils.ValidarCaminho(caminhoArquivo))
             {
-                using (StreamWriter sw = new StreamWriter(caminhoArquivo))
+                using (var sw = new StreamWriter(caminhoArquivo))
                 {
                     foreach(var venda in vendas)
                     {
-                        sw.WriteLine($"{venda.Id}, {venda.Data}, {venda.ClienteId}, {venda.ValorTotal}")
+                        sw.WriteLine($"{venda.Id}, {venda.Data}, {venda.ClienteId}, {venda.ValorTotal}");
                     }
                 }
             }
@@ -101,5 +94,10 @@
         {
             Console.WriteLine($"Erro ao gravar o arquivo: {ex.Message}");
         }
+    }
+
+    public string ToString(Venda v)
+    {
+        return $" Venda Id {v.Id}, Data Da venda{v.Data}, Cliente{v.ClienteId}, Valor Total {v.ValorTotal}";
     }
 }
