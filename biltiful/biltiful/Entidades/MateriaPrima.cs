@@ -64,7 +64,10 @@
 
         materiaPrima = new MateriaPrima(nome);
         
-            File.AppendAllText(filePath, materiaPrima.ToStringFile() + Environment.NewLine);
+            //File.AppendAllText(filePath, materiaPrima.ToStringFile() + Environment.NewLine);
+            //estava lendo o arquivo e salvando o novo elemento no final dele, mas alterei
+            //para o padrão do projeto de salvar em uma lista 
+
 
             return materiaPrima;
 
@@ -160,10 +163,28 @@
 
     }
 
+    public static void GravarNoArquivo(List<MateriaPrima> materias)
+    {
+
+        var writer = new StreamWriter(filePath, true);
+        File.WriteAllText(filePath, "");
+        foreach(var materia in materias)
+        {
+            string informacoes = materia.ToStringFile();
+            writer.WriteLine(informacoes);
+        }
+
+        writer.Close();
+
+    }
+
     public string ToStringFile()
     {
         return $"{Nome}{Id}{DataCadastro}{UltimaCompra}{Situacao}";
     }
+
+
+
 
     public override string ToString()
     {

@@ -5,8 +5,8 @@ using System.Text.RegularExpressions;
 
 List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
 List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores("Fornecedor.dat");
-List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
-List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
+List<Produto> produtos = Produto.CarregarProdutos();
+List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
 List<Inadimplentes> inadimplentes = Inadimplentes.CarregarArquivo();
 List<Bloqueados> bloqueados = Bloqueados.CarregarArquivo();
 //--------------------------------------------------------------------------------
@@ -261,7 +261,7 @@ void CadastrarMateriaPrima()
         Console.WriteLine("Informe o nome da matéria prima: ");
         string nomeMateriaPrima = Console.ReadLine();
 
-        materiasPrimas.Add(MateriaPrima.CadastrarMateriaPrima(nomeMateriaPrima));
+        materiasPrimas.Add(MateriaPrima.CadastrarMateriaPrima(materiasPrimas, nomeMateriaPrima));
     }
     catch (Exception e)
     {

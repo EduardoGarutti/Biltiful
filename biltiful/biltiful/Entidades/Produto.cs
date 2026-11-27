@@ -102,7 +102,7 @@ public class Produto
 
         var produto = new Produto(nome, valorVenda, codigoBarras);
 
-        File.AppendAllText(filePath, produto.ToStringFile() + Environment.NewLine);
+        //File.AppendAllText(filePath, produto.ToStringFile() + Environment.NewLine);
 
         return produto;
 
@@ -194,6 +194,21 @@ public class Produto
         
             this.ValorVenda = valor;
             
+    }
+
+    public static void GravarNoArquivo(List<Produto> produtos)
+    {
+
+        var writer = new StreamWriter(filePath, true);
+        File.WriteAllText(filePath, "");
+        foreach (var produto in produtos)
+        {
+            string informacoes = produto.ToStringFile();
+            writer.WriteLine(informacoes);
+        }
+
+        writer.Close();
+
     }
 
     public string ToStringFile()
