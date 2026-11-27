@@ -86,11 +86,11 @@
         {
             int id = 1;
 
-            foreach (Producao producao in producoes)
+            foreach (Producao producao1 in producoes)
             {
-                if (producao.Id >= id)
+                if (producao1.Id >= id)
                 {
-                    id = producao.Id + 1;
+                    id = producao1.Id + 1;
                 }
             }
 
@@ -208,4 +208,8 @@
             + quantidade.PadRight(5); ;
     }
 
+    public override string ToString()
+    {
+        return $"Id: {Id}\nData Produção: {DataProducao}\nCódigo do Produto: {Produto}\nQuantidade: {Quantidade}";
+    }
 }
