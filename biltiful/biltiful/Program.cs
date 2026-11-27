@@ -1,13 +1,17 @@
-﻿List<Cliente> clientes = Cliente.CarregarClientes();
-List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
-List<Produto> produtos = Produto.CarregarProdutos();
-List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
-List<Banidos> inadimplentes = Inadimplentes.CarregarArquivo();
-List<Banidos> bloqueados = Bloqueados.CarregarArquivo();
-List<Compra> compras = Compra.CarregarCompras("Compra.dat");
+﻿using biltiful;
+using System.Globalization;
+using System.Text.RegularExpressions;
+
+
+List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
+List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores("Fornecedor.dat");
+List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
+List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
+List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
+List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
+//--------------------------------------------------------------------------------
 List<Venda> vendas = CarregarVendas("Vendas.dat");
 
-InicializarPrograma();
 void InicializarPrograma()
 {
     while (true)
@@ -148,34 +152,33 @@ void MenuConsultas()
 }
 void MenuVendas()
 {
-    try
+    var escolha = Utils.CriarMenu(new List<string>(){
+        "============Vendas============\n",
+        "[1] - Cadastrar Venda\n",
+        "[2] - Consultar Venda\n",
+        "[3] - Salvar Venda\n",
+        "[0] - Voltar\n",
+        "================================"
+        });
+
+    switch (escolha)
     {
-        Console.WriteLine("Informe o CPF do cliente que deseja realizar uma venda: ");
-        string cpf = Console.ReadLine();
-
-        Cliente aux;
-        ExisteCPF(cpf, aux);
-
-        isMenorIdade(aux);
-
-        vendas.Add(CadastrarVenda(vendas, clientes, inadimplentes, cpf));
-
-
-    } catch(Exception e)
-    {
-        Console.WriteLine("Erro: "+e.Message);
-        if (TentarNovamente())
-        {
-            Console.WriteLine("Reiniciando Processo de Venda...");
-            MenuVendas();
-        }
+        case '1':
+            VendasMenu.Cadastrar(vendas, clientes, inadimplentes);
+            break;
+        case '2':
+            VendasMenu.Localizar(vendas);
+            break;
+        case '3':
+            VendasMenu.Salvar(vendas);
+            break;
+        case '0':
+            return;
+        default:
+            Console.WriteLine("Opção Invalida!");
+            break;
     }
 }
-void MenuCompras()
-{
-    Comprar.RealizarCompra(fornecedores, compras, bloqueados, materiasPrimas);
-}
-void MenuProducao()
-{
 
+    
 }
