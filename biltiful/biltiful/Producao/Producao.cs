@@ -26,7 +26,7 @@
 
     public Producao(int id, string produto, int quantidade)
     {
-        Id = Contador;
+        Id = id;
         Contador++;
         DataProducao = DateTime.Now;
         Produto = produto;
@@ -74,9 +74,9 @@
                 }
             }
         }
-        catch
+        catch (Exception e)
         {
-            throw new Exception($"Ocorreu um erro ao salvar as Produções");
+            throw new Exception($"Ocorreu um erro ao salvar as Produções: {e.Message}");
         }
     }
 
@@ -108,11 +108,10 @@
 
             return (producao, itensProducao);
         }
-        catch
+        catch (Exception e)
         {
-            throw new Exception("Ocorreu um erro ao criar a Produção.");
+            throw new Exception($"Ocorreu um erro ao criar a Produção: {e.Message}");
         }
-
     }
 
     public int LocalizarProducao(List<Producao> producoes, int id)
@@ -141,9 +140,9 @@
             SalvarArquivoProducao(producoes);
             return true;
         }
-        catch
+        catch (Exception e)
         {
-            throw new Exception("Ocorreu um erro ao excluir a produção!");
+            throw new Exception($"Ocorreu um erro ao excluir a produção: {e.Message}");
         }
     }
 

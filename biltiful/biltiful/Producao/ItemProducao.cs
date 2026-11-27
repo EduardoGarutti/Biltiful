@@ -69,9 +69,9 @@
                 }
             }
         }
-        catch
+        catch (Exception e)
         {
-            throw new Exception($"Ocorreu um erro ao salvar os Itens Produção");
+            throw new Exception($"Ocorreu um erro ao salvar os Itens Produção: {e.Message}");
         }
     }
 
@@ -93,9 +93,9 @@
 
             return itensProducao;
         }
-        catch
+        catch (Exception e)
         {
-            throw new Exception("Ocorreu um erro ao criar o Item Produção.");
+            throw new Exception($"Ocorreu um erro ao criar o Item Produção: {e.Message}");
         }
 
     }
@@ -124,9 +124,9 @@
             SalvarArquivoItemProducao(itemProducoes);
             return true;
         }
-        catch
+        catch (Exception e)
         {
-            throw new Exception("Ocorreu um erro ao excluir o Item Produção!");
+            throw new Exception($"Ocorreu um erro ao excluir o Item Produção: {e.Message}");
         }
     }
 
