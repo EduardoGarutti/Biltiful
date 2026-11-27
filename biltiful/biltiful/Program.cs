@@ -6,6 +6,8 @@ List<Banidos> inadimplentes = Inadimplentes.CarregarArquivo();
 List<Banidos> bloqueados = Bloqueados.CarregarArquivo();
 List<Compra> compras = Compra.CarregarCompras("Compra.dat");
 List<Venda> vendas = CarregarVendas("Vendas.dat");
+List<Producao> producoes = Producao.CarregarProducoes();
+List<ItemProducao> itemproducoes = ItemProducao.CarregarItemProducoes();
 
 InicializarPrograma();
 void InicializarPrograma()
@@ -177,5 +179,5 @@ void MenuCompras()
 }
 void MenuProducao()
 {
-
+    Produzir.RealizarProducao(producoes);
 }

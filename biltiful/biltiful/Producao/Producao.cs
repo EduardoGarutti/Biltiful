@@ -80,7 +80,7 @@
         }
     }
 
-    public static (Producao?,List<ItemProducao> itensProducao) CadastrarProducao(List<Producao> producoes, string produtoId, int quantidade,string materiaPrimaId,int quantidadeMateriaPrima)
+    public static Producao? CadastrarProducao(List<Producao> producoes, string produtoId, int quantidade)
     {
         try
         {
@@ -104,9 +104,7 @@
             }
             Producao producao = new Producao(id, produtoId, quantidade);
 
-            var itensProducao =ItemProducao.CadastrarItemProducao(producao,materiaPrimaId, quantidadeMateriaPrima, quantidade);
-
-            return (producao, itensProducao);
+            return (producao);
         }
         catch (Exception e)
         {
