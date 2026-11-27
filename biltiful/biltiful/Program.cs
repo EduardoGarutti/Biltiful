@@ -2,12 +2,15 @@
 List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
 List<Produto> produtos = Produto.CarregarProdutos();
 List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
-List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
-List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
-//--------------------------------------------------------------------------------
-List<Venda> vendas = Vendas.CarregarVendas();
 List<Compra> compras = Compra.CarregarCompras();
 
+string pathInadimplentes = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Riscos.dat"));
+string pathBloqueados = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Bloqueados.dat"));
+string pathVendas = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Venda.dat"));
+
+List<string> inadimplentes = Banidos.CarregarArquivo(pathInadimplentes);
+List<string> bloqueados = Banidos.CarregarArquivo(pathBloqueados);
+List<Venda> vendas = Venda.CarregarVendas(pathVendas);
 void InicializarPrograma()
 {
     while (true)
@@ -20,7 +23,7 @@ void InicializarPrograma()
         "[4] - Comprar\n",
         "[5] - Produzir\n",
         "[0] - Sair\n",
-        "================================"
+        "================================\n"
         });
 
         switch (escolha)
@@ -65,7 +68,7 @@ void MenuCadastro()
         "[5] - Cadastrar Cliente Inadimplente\n",
         "[6] - Cadastrar Fornecedor Bloqueado\n",
         "[0] - Voltar\n",
-        "================================"
+        "================================\n"
         });
 
         switch (escolha)
@@ -162,13 +165,13 @@ void MenuVendas()
     switch (escolha)
     {
         case '1':
-            VendasMenu.Cadastrar(vendas, clientes, inadimplentes);
+            biltiful.Controller.Vender.RealizarVenda(vendas, clientes, inadimplentes);
             break;
         case '2':
-            VendasMenu.Localizar(vendas);
+            biltiful.Controller.Vender.Localizar(vendas);
             break;
         case '3':
-            VendasMenu.Salvar(vendas);
+            biltiful.Controller.Vender.Salvar(vendas);
             break;
         case '0':
             return;
@@ -180,7 +183,7 @@ void MenuVendas()
 
 void MenuComprar()
 {
-    Comprar.RealizarCompra();
+    Comprar.RealizarCompra(fornecedores, compras, bloqueados, materiasPrimas);
 }
 void MenuProducao()
 {

@@ -4,16 +4,13 @@ using System.Text.RegularExpressions;
 public class Cadastrar()
 {
 
-    public static void CadastrarCliente<T>(List<T> clientes)
+    public static void CadastrarCliente(List<Cliente> clientes)
     {
         try
         {
             string cpf;
-            do
-            {
-                Console.WriteLine("Informe CPF do Cliente: ");
-                cpf = Console.ReadLine();
-            } while (cpf.Length != 14);
+            Console.WriteLine("Informe CPF do Cliente: ");
+            cpf = Console.ReadLine();
 
             Console.WriteLine("Informe o nome do Cliente: ");
             string nome = Console.ReadLine();
@@ -70,7 +67,7 @@ public class Cadastrar()
             }
         }
     }
-    public static void CadastrarFornecedor<T>(List<T> fornecedores)
+    public static void CadastrarFornecedor(List<Fornecedor> fornecedores)
     {
         try
         {
@@ -96,7 +93,7 @@ public class Cadastrar()
             }
         }
     }
-    public static void CadastrarProduto<T>(List<T> produtos)
+    public static void CadastrarProduto(List<Produto> produtos)
     {
         try
         {
@@ -136,14 +133,14 @@ public class Cadastrar()
         }
 
     }
-    public static void CadastrarMateriaPrima<T>(List<T> materiasPrimas)
+    public static void CadastrarMateriaPrima(List<MateriaPrima> materiasPrimas)
     {
         try
         {
             Console.WriteLine("Informe o nome da matéria prima: ");
             string nomeMateriaPrima = Console.ReadLine();
 
-            materiasPrimas.Add(MateriaPrima.CadastrarMateriaPrima(nomeMateriaPrima));
+            materiasPrimas.Add(MateriaPrima.CadastrarMateriaPrima(materiasPrimas, nomeMateriaPrima));
         }
         catch (Exception e)
         {
@@ -192,7 +189,7 @@ public class Cadastrar()
             string cnpj;
             do
             {
-                Console.WriteLine("Informe CNPJ do Inadimplente (00.000.000/0001-00): ");
+                Console.WriteLine("Informe CNPJ do Inadimplente: ");
                 cnpj = Console.ReadLine();
 
                 int aux = int.Parse(Regex.Replace(cnpj, @"[^a-zA-Z0-9]", "");
@@ -219,21 +216,9 @@ public class Cadastrar()
             if (Utils.TentarNovamente())
             {
                 Console.WriteLine("Reiniciando Processo de Cadastro...");
-                CadastrarInadimplente(bloqueados, fornecedores);
+                CadastrarBloqueado(bloqueados, fornecedores);
             }
         }
-    }
-    void ExisteCPF(string cpf, Cliente aux, List<Cliente> clientes)
-    {
-        foreach (var cliente in clientes)
-        {
-            if (cliente.CPF.Equals(cpf))
-            {
-                aux = cliente;
-                return;
-            }
-        }
-        throw new Exception("Cpf não encontrado na lista!");
     }
 }
 

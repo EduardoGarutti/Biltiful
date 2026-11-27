@@ -2,7 +2,7 @@
 
 public class Compra : TransacaoComercial
 {
-    public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Compra.dat"));
+    public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Compra.dat"));
     // Armazena o CNPJ do fornecedor responsável pela compra.
     public string Fornecedor { get; private set; }
 
@@ -31,7 +31,7 @@ public class Compra : TransacaoComercial
         List<Compra> compras,
         string cnpjFornecedor,
         List<Fornecedor> fornecedores,
-        List<Bloqueados> bloqueados)
+        List<string> bloqueados)
     {
         Fornecedor fornecedor = BuscarFornecedor(
             fornecedores, cnpjFornecedor);
@@ -228,12 +228,12 @@ public class Compra : TransacaoComercial
 
     // Verifica se o CNPJ consta na lista de fornecedores bloqueados.
     private static void ValidarFornecedorBloqueado(
-        List<Bloqueados> bloqueados,
+        List<string> bloqueados,
         string cnpjFornecedor)
     {
-        foreach (Bloqueados bloqueado in bloqueados)
+        foreach (var bloqueado in bloqueados)
         {
-            if (bloqueado.Id == cnpjFornecedor)
+            if (bloqueado == cnpjFornecedor)
             {
                 throw new Exception(
                     "Fornecedor está bloqueado para realizar operações comerciais");

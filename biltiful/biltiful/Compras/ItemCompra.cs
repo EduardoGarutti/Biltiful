@@ -100,7 +100,7 @@ public class ItemCompra
         Compra compra = compras[indiceCompra];
 
         //Uso do 'global::MateriaPrima para identificar explicitamente a classe, e a propriedade dessa classe
-        int indiceMateriaPrima = global::MateriaPrima.LocalizarMateriaPrima(
+        int indiceMateriaPrima = global::MateriaPrima.LocalizarMateria(
             materiasPrimas, materiaPrimaId);
 
         if (indiceMateriaPrima == -1)

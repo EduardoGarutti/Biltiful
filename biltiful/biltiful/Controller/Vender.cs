@@ -3,7 +3,7 @@
     public class Vender
     {
 
-        public static void Cadastrar(List<Venda> vendas, List<Cliente> clientes, List<string> inadimplentes)
+        public static void RealizarVenda(List<Venda> vendas, List<Cliente> clientes, List<string> inadimplentes)
         {
             try
             {

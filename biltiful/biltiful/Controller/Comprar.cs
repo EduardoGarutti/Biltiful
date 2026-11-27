@@ -1,6 +1,6 @@
 ﻿public class Comprar()
 {
-    public static void RealizarCompra<T>(List<Fornecedor> fornecedores, List<Compra> compras, List<Bloqueados> bloqueados, List<MateriaPrima> materiaPrima)
+    public static void RealizarCompra(List<Fornecedor> fornecedores, List<Compra> compras, List<string> bloqueados, List<MateriaPrima> materiaPrima)
     {
         try
         {
@@ -22,7 +22,7 @@
         } catch(Exception e)
         {
             Console.WriteLine("Erro: " + e.Message);
-            RealizarCompra<T>(fornecedores, compras, bloqueados, materiaPrima);
+            RealizarCompra(fornecedores, compras, bloqueados, materiaPrima);
         }
         
             Console.WriteLine("Compra realizada com Sucesso!");
