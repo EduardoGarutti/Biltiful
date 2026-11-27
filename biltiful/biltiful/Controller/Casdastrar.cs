@@ -224,13 +224,13 @@ public class Cadastrar()
                 Console.WriteLine("Informe CNPJ do Inadimplente (00.000.000/0001-00): ");
                 cnpj = Console.ReadLine();
 
-                int aux = int.Parse(Regex.Replace(cnpj, @"[^a-zA-Z0-9]", "");
+                int aux = int.Parse(Regex.Replace(cnpj, @"[^a-zA-Z0-9]", ""));
             } while (cnpj.Length != 18);
 
             bool existeFornecedor = false;
             foreach (var fornecedor in fornecedores)
             {
-                if (fornecedor.cnpj == cnpj)
+                if (fornecedor. == cnpj)
                 {
                     existeFornecedor = true;
                 }
