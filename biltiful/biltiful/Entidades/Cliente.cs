@@ -94,6 +94,17 @@ public class Cliente : EntidadeBase
         writer.Close();
     }
 
+    public static bool EhMenorDeIdade(Cliente cliente)
+    {
+        DateTime hoje = DateTime.Today;
+        int idade = hoje.Year - cliente.DataNascimento.Year;
+
+        if (cliente.DataNascimento.Date > hoje.AddYears(-idade).Date) idade--;
+
+        if (idade < 18) return true;
+        else return false;
+    }
+
     public static bool ValidarSexo(char sexo)
     {
         string sexoFormatado = sexo.ToString().ToLower();
@@ -163,7 +174,6 @@ public class Cliente : EntidadeBase
 
         return true;
     }
-
 
 
 }

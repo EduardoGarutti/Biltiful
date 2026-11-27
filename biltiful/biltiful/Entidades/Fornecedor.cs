@@ -69,6 +69,18 @@ public class Fornecedor : EntidadeBase
         return CadastrarFornecedor(lista, cnpj, novaRazaoSocial, novaDataAbertura, true);
     }
 
+    public static List<Fornecedor> ListarFornecedoresAtivos(List<Fornecedor> lista)
+    {
+        List<Fornecedor> fornecedoresAtivos = new List<Fornecedor>();
+
+        foreach (var fornecedor in lista)
+        {
+            if (fornecedor.Situacao == ESituacao.A) fornecedoresAtivos.Add(fornecedor);
+        }
+
+        return fornecedoresAtivos;
+    }
+
     public static void GravarNoArquivo(List<Fornecedor> fornecedores)
     {
 
@@ -89,6 +101,17 @@ public class Fornecedor : EntidadeBase
         }
 
         writer.Close();
+    }
+
+    public static bool CriadaRecentemente(Fornecedor fornecedor)
+    {
+        DateTime hoje = DateTime.Today;
+        int idadeDaEmpresaEmMeses = (hoje.Year - fornecedor.DataAbertura.Year) * 12 + hoje.Month - fornecedor.DataAbertura.Month;
+
+        if (hoje.Day < fornecedor.DataAbertura.Day) idadeDaEmpresaEmMeses--;
+
+        if (idadeDaEmpresaEmMeses < 6) return true;
+        else return false;
     }
 
     public static bool ValidarCNPJ(string cnpj)
