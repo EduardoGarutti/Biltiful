@@ -11,6 +11,8 @@ List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
 List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
 //--------------------------------------------------------------------------------
 List<Venda> vendas = CarregarVendas("Vendas.dat");
+List<Producao> producoes = Producao.CarregarProducoes();
+List<ItemProducao> itemproducoes = ItemProducao.CarregarItemProducoes();
 
 void InicializarPrograma()
 {
@@ -179,6 +181,11 @@ void MenuVendas()
             break;
     }
 }
-
-    
+void MenuCompras()
+{
+    Comprar.RealizarCompra(fornecedores, compras, bloqueados, materiasPrimas);
+}
+void MenuProducao()
+{
+    Produzir.RealizarProducao(producoes);
 }
