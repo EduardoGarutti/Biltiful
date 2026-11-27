@@ -151,15 +151,11 @@
 
         if (nome.Length > 20)
         {
-            nome = nome.Substring(0, 20); // subtrai os caracteres restantes no nome se ele passar de 20
+            throw new Exception("nome não pode ultrapassar 20 caracteres");
 
-            this.Nome = nome;
         }
-        else
-        {
-            nome = nome.PadRight(20);
-            this.Nome = nome;
-        }
+
+        Nome = nome;
 
     }
 
@@ -170,7 +166,7 @@
         File.WriteAllText(filePath, "");
         foreach(var materia in materias)
         {
-            string informacoes = materia.ToStringFile();
+            string informacoes = materia.ToFile();
             writer.WriteLine(informacoes);
         }
 
@@ -178,9 +174,9 @@
 
     }
 
-    public string ToStringFile()
+    public string ToFile()
     {
-        return $"{Nome}{Id}{DataCadastro}{UltimaCompra}{Situacao}";
+        return $"{Nome.PadRight(20)}{Id}{DataCadastro}{UltimaCompra}{Situacao}";
     }
 
 

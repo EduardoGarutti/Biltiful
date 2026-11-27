@@ -1,6 +1,6 @@
 ﻿public class Comprar()
 {
-    public static void RealizarCompra<T>(List<T> fornecedores, List<T> compras, List<T> bloqueados, List<T> materiaPrima)
+    public static void RealizarCompra<T>(List<Fornecedor> fornecedores, List<Compra> compras, List<Bloqueados> bloqueados, List<MateriaPrima> materiaPrima)
     {
         try
         {
@@ -10,14 +10,22 @@
             Console.WriteLine("Informe CPNJ do forncedor");
             string cnpj = Console.ReadLine();
 
+            //aqui tenho que perguntar o id da materia que vai ser comprada
+            Console.WriteLine("Informe o id da matéria-prima que deseja comprar");
+            string idMateria = Console.ReadLine();
+            MateriaPrima.LocalizarMateria(materiaPrima, idMateria); //esta localizando a matéria prima
+            
+
+            
+
             compras.Add(Compra.CadastrarCompra(compras, cnpj, fornecedores, bloqueados));
-            Console.WriteLine("Compra realizada com Sucesso!");
         } catch(Exception e)
         {
             Console.WriteLine("Erro: " + e.Message);
-            RealizarCompra(fornecedores, compras, bloqueados);
+            RealizarCompra<T>(fornecedores, compras, bloqueados, materiaPrima);
         }
         
+            Console.WriteLine("Compra realizada com Sucesso!");
     }
 }
 
