@@ -1,23 +1,28 @@
 ﻿public class Venda
 {
-    public int Id { get; set; }
+    public int Id { get; set; } = 0;
     public DateTime Data { get; set; }
     public string ClienteId { get; set; }
-    public double ValorTotal { get; set; }   
-
-    public Venda(int id, string data, string clienteId, string valorTotal)
+    public decimal ValorTotal { get; set; }  
+    
+    public Venda()
     {
-        Id = id;
-        Data = DateTime.Parse(data);
+
+    }
+
+    public Venda(string clienteId, decimal valorTotal)
+    {
+        Id++;
+        Data = DateTime.Now;
         ClienteId = clienteId;
-        ValorTotal = double.Parse(valorTotal);
+        ValorTotal = valorTotal;
     }
     public static List<Venda> CarregarVendas(string caminhoArquivo)
     {
         var vendas = new List<Venda>();
         try
         {
-            if (Utils.ValidarcaminhoArquivo(caminhoArquivo))
+            if (Utils.ValidarCaminho(caminhoArquivo))
 
                 foreach (var venda in File.ReadAllLines(caminhoArquivo))
                 {
@@ -43,33 +48,58 @@
 
     }
 
-    public static Venda CadastrarVenda(List<Cliente> clientes, List<Inadimplentes> inadimplentes, string cpf)
+    public bool ValidarDatanas()
     {
-        var cliente = clientes.FirstOrDefault(c => c.CPF == cpf);
-        if (cliente == null)
+        return true;
+    }
+
+    public static Venda CadastrarVenda(List<Cliente> clientes, string cpf, decimal valor)
+    {
+       foreach(var cliente in clientes)
         {
-            Console.WriteLine("Cliente não encontrado.");            
+            if(cliente.CPF == cpf)
+            {
+               if(!ValidarDatanas())
+                {
+                    throw new ArgumentException("Cliente menor de idade");
+                }
+                return new Venda(cpf, valor);
+            }
         }
-        if(inadimplentes.Any(i => i.CPF == cpf))
-        {
-            Console.WriteLine("Cliente inadimplente:");
-        } 
-        
-       
+        throw new ArgumentException("Cliente nao encontrado");
     }
 
     public static int LocalizarVenda(List<Venda> vendas, int id)
     {
-       for (int i = 0; i < vendas.Count; i++)
+       foreach(var venda in vendas)
         {
-            if (vendas[i].Id == id)
-                return i;
+            if(venda.Id == id)
+            {
+                return vendas.IndexOf(venda);
+            }
         }
         return -1;
     }
 
     public void GravarNoArquivo(List<Venda> vendas, string caminhoArquivo)
     {
-
+        try
+        {
+            if (Utils.ValidarCaminho(caminhoArquivo))
+            {
+                using (StreamWriter sw = new StreamWriter(caminhoArquivo))
+                {
+                    foreach(var venda in vendas)
+                    {
+                        sw.WriteLine($"{venda.Id}, {venda.Data}, {venda.ClienteId}, {venda.ValorTotal}")
+                    }
+                }
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao gravar o arquivo: {ex.Message}");
+        }
     }
 }
