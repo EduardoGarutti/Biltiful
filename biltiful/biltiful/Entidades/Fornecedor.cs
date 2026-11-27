@@ -10,11 +10,11 @@ public class Fornecedor : EntidadeBase
     public DateTime DataAbertura { get; set; }
 
 
-    public Fornecedor(string cnpj, string razaoSocial, DateTime dataAbertura)
+    public Fornecedor(string cnpj, string razaoSocial, string dataAbertura)
     {
         this.CNPJ = cnpj;
         this.RazaoSocial = razaoSocial;
-        this.DataAbertura = dataAbertura;
+        this.DataAbertura = DateTime.ParseExact(dataAbertura, "dd/MM/yyyy", CultureInfo.InvariantCulture);
     }
 
     public static List<Fornecedor> CarregarFornecedores()
@@ -27,15 +27,15 @@ public class Fornecedor : EntidadeBase
 
         foreach (var fornecedor in fornecedores)
         {
-            string cnpj = fornecedor.Substring(0, 18);
-            string razaoSocial = fornecedor.Substring(18, 68);
-            DateTime abertura = DateTime.ParseExact(fornecedor.Substring(68, 78), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            string cnpj = fornecedor.Substring(0, 14);
+            string razaoSocial = fornecedor.Substring(14, 64).TrimEnd();
+            string abertura = fornecedor.Substring(64, 74);
 
             Fornecedor fornecedorCarregado = new Fornecedor(cnpj, razaoSocial, abertura);
 
-            fornecedorCarregado.DataUltimaCompra = DateTime.ParseExact(fornecedor.Substring(78, 88), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            fornecedorCarregado.DataCadastro = DateTime.ParseExact(fornecedor.Substring(88, 98), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            fornecedorCarregado.Situacao = Enum.Parse<ESituacao>(fornecedor[98].ToString());
+            fornecedorCarregado.DataUltimaCompra = DateTime.ParseExact(fornecedor.Substring(74, 84), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            fornecedorCarregado.DataCadastro = DateTime.ParseExact(fornecedor.Substring(84, 94), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            fornecedorCarregado.Situacao = Enum.Parse<ESituacao>(fornecedor[94].ToString());
 
             listaFornecedores.Add(fornecedorCarregado);
         }
@@ -43,8 +43,11 @@ public class Fornecedor : EntidadeBase
         return listaFornecedores;
     }
 
-    public static Fornecedor CadastrarFornecedor(List<Fornecedor> lista, string cnpj, string razaoSocial, DateTime abertura, bool Editando = false)
+    public static Fornecedor CadastrarFornecedor(List<Fornecedor> lista, string cnpj, string razaoSocial, string abertura, bool Editando = false)
     {
+        cnpj = Regex.Replace(cnpj, @"\.||\/||\-", "").TrimEnd().TrimStart();
+        razaoSocial = razaoSocial.TrimEnd().TrimStart();
+        abertura = abertura.TrimEnd().TrimStart();
 
         if (LocalizarFornecedor(lista, cnpj) != -1 && !Editando) throw new Exception("Já existe um fornecedor com esse CNPJ");
         if (LocalizarFornecedor(lista, cnpj) == -1 && Editando) throw new Exception("Não existe um fornecedor com esse CNPJ");
@@ -53,18 +56,20 @@ public class Fornecedor : EntidadeBase
         ValidarNome(razaoSocial);
         ValidarData(abertura);
 
+        cnpj = Regex.Replace(cnpj, @"\.||\/||\-", "");
+
         return new Fornecedor(cnpj, razaoSocial, abertura);
     }
 
     public static int LocalizarFornecedor(List<Fornecedor> lista, string cnpj)
     {
-        Fornecedor fornecedorComCNPJExistente = lista.Find(fornecedor => fornecedor.CNPJ == cnpj);
+        Fornecedor? fornecedorComCNPJExistente = lista.Find(fornecedor => fornecedor.CNPJ == cnpj);
 
-        if (lista.Contains(fornecedorComCNPJExistente)) return lista.IndexOf(fornecedorComCNPJExistente);
+        if (fornecedorComCNPJExistente != null) return lista.IndexOf(fornecedorComCNPJExistente);
         else return -1;
     }
 
-    public static Fornecedor EditarFornecedor(List<Fornecedor> lista, string cnpj, string novaRazaoSocial, DateTime novaDataAbertura)
+    public static Fornecedor EditarFornecedor(List<Fornecedor> lista, string cnpj, string novaRazaoSocial, string novaDataAbertura)
     {
         return CadastrarFornecedor(lista, cnpj, novaRazaoSocial, novaDataAbertura, true);
     }
@@ -103,7 +108,7 @@ public class Fornecedor : EntidadeBase
         writer.Close();
     }
 
-    public static bool CriadaRecentemente(Fornecedor fornecedor)
+    public static bool AbertaRecentemente(Fornecedor fornecedor)
     {
         DateTime hoje = DateTime.Today;
         int idadeDaEmpresaEmMeses = (hoje.Year - fornecedor.DataAbertura.Year) * 12 + hoje.Month - fornecedor.DataAbertura.Month;
@@ -116,7 +121,7 @@ public class Fornecedor : EntidadeBase
 
     public static bool ValidarCNPJ(string cnpj)
     {
-        bool EhValido = Regex.IsMatch(cnpj, @"^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$");
+        bool EhValido = Regex.IsMatch(cnpj, @"^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}\-?\d{2}$");
         if (!EhValido) throw new Exception("O CNPJ não está no formato correto");
 
         string digitosIniciais = Regex.Replace(cnpj[0..15], @"\.||\/", "");
@@ -182,5 +187,10 @@ public class Fornecedor : EntidadeBase
         }
 
         return true;
+    }
+
+    public override string ToString()
+    {
+        return $"CNPJ: {this.CNPJ}\nRazão social: {this.RazaoSocial}\nData de abertura: {this.DataAbertura}\nData do cadastro: {this.DataCadastro}\nData da última compra: {this.DataUltimaCompra}\nSituação: {this.Situacao}";
     }
 }
