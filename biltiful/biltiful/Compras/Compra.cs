@@ -21,6 +21,33 @@ public class Compra : TransacaoComercial
         ValorTotal = valorTotal;
     }
 
+    // =====================================================
+    // Métodos públicos definidos no Trello.
+    // =====================================================
+
+    // Valida as regras comerciais e retorna uma nova compra.
+    public static Compra CadastrarCompra(
+        List<Compra> compras,
+        string cnpjFornecedor,
+        List<Fornecedor> fornecedores,
+        List<Bloqueados> bloqueados)
+    {
+        Fornecedor fornecedor = BuscarFornecedor(
+            fornecedores, cnpjFornecedor);
+
+        ValidarSituacaoFornecedor(fornecedor);
+
+        ValidarFornecedorBloqueado(bloqueados, cnpjFornecedor);
+
+        DateTime dataCompra = DateTime.Now;
+
+        ValidarDataAbertura(fornecedor, dataCompra);
+
+        int id = GerarId(compras);
+
+        return new Compra(id, dataCompra, cnpjFornecedor);
+    }
+
     // Retorna o índice da compra ou -1 caso não seja encontrada.
     public static int LocalizarCompra(List<Compra> compras, int id)
     {
@@ -61,69 +88,151 @@ public class Compra : TransacaoComercial
         compras.RemoveAt(indice);
     }
 
-    // Valida as regras comerciais e retorna uma nova compra.
-    public static Compra CadastrarCompra(
-        List<Compra> compras,
-        string cnpjFornecedor,
-        List<Fornecedor> fornecedores,
-        List<Bloqueados> bloqueados)
+    // Grava todas as compras no arquivo com campos de tamanho fixo.
+    public static void GravarNoArquivo(
+        List<Compra> compras, string caminhoArquivo)
     {
-        Fornecedor fornecedor = BuscarFornecedor(fornecedores, cnpjFornecedor);
+        // O using garante o descarte do StreamWriter
+        // ao finalizar a operação.
+        using (StreamWriter sw = new StreamWriter(caminhoArquivo))
+        {
+            foreach (Compra compra in compras)
+            {
+                string id = compra.Id.ToString().PadLeft(5);
 
-        ValidarSituacaoFornecedor(fornecedor);
+                string data = compra.Data.ToString(
+                    "ddMMyyyy", CultureInfo.InvariantCulture);
 
-        ValidarFornecedorBloqueado(bloqueados, cnpjFornecedor);
+                string fornecedor = compra.Fornecedor.PadRight(14);
 
-        DateTime dataCompra = DateTime.Now;
+                string valorTotal = compra.ValorTotal
+                    .ToString("F2", CultureInfo.InvariantCulture)
+                    .PadLeft(8);
 
-        ValidarDataAbertura(fornecedor, dataCompra);
+                string registro = id + data + fornecedor + valorTotal;
 
-        int id = GerarId(compras);
+                sw.WriteLine(registro);
+            }
+        }
+    }
 
-        return new Compra(id, dataCompra, cnpjFornecedor);
+    // Carrega as compras gravadas no arquivo.
+    public static List<Compra> CarregarCompras(string caminhoArquivo)
+    {
+        // A lista será preenchida com os objetos recuperados do arquivo.
+        List<Compra> compras = new List<Compra>();
+
+        // Caso o arquivo não exista, retorna uma lista vazia.
+        if (!File.Exists(caminhoArquivo))
+        {
+            return compras;
+        }
+
+        using (StreamReader sr = new StreamReader(caminhoArquivo))
+        {
+            string? linha;
+
+            // Realiza a leitura até encontrar o final do arquivo.
+            while ((linha = sr.ReadLine()) != null)
+            {
+                // Cada registro deve possuir exatamente 35 caracteres.
+                if (linha.Length != 35)
+                {
+                    throw new FormatException(
+                        "Registro de compra inválido.");
+                }
+
+                int id = int.Parse(linha.Substring(0, 5).Trim());
+
+                // Substring recebe o índice inicial e a quantidade
+                // de caracteres que serão extraídos.
+                // InvariantCulture evita diferenças de configuração regional.
+                DateTime dataCompra = DateTime.ParseExact(
+                    linha.Substring(5, 8),
+                    "ddMMyyyy",
+                    CultureInfo.InvariantCulture);
+
+                string fornecedor = linha.Substring(13, 14).Trim();
+
+                double valorTotal = double.Parse(
+                    linha.Substring(27, 8).Trim(),
+                    CultureInfo.InvariantCulture);
+
+                // Reconstrói a compra preservando os dados originais.
+                Compra compra = new Compra(
+                    id, dataCompra, fornecedor, valorTotal);
+
+                compras.Add(compra);
+            }
+        }
+
+        return compras;
     }
 
     // =====================================================
-    // Métodos auxiliares utilizados no cadastro de compras.XD
+    // Método auxiliar público utilizado pela classe ItemCompra  XXDD
     // =====================================================
 
-    // Método auxiliar responsável por localizar o fornecedor
-    // pelo CNPJ ou lançar uma exceção caso não seja encontrado.
+    // Atualiza o valor total da compra apos o cadastro de um item.
+    public void AcrescentarValorTotal(double valorItem)
+    {
+        if (!(valorItem >= 0 && valorItem <= 9999.99))
+        {
+            throw new ArgumentException("Valor do item inválido.");
+        }
+
+        double novoTotal = Math.Round(ValorTotal + valorItem, 2);
+
+        if (novoTotal > 99999.99)
+        {
+            throw new Exception(
+                "O valor total da compra passou o limite permitido!!");
+        }
+
+        ValorTotal = novoTotal;
+    }
+
+    // =====================================================
+    // Métodos auxiliares privados utilizados no cadastro  XD
+    // =====================================================
+
+    // Localiza o fornecedor pelo CNPJ.
+    // global::Fornecedor diferencia a classe Fornecedor
+    // da propriedade Fornecedor existente nesta classe.
     private static Fornecedor BuscarFornecedor(
         List<Fornecedor> fornecedores,
         string cnpjFornecedor)
     {
-        foreach (Fornecedor fornecedor in fornecedores)
+        int indice = global::Fornecedor.LocalizarFornecedor(
+            fornecedores, cnpjFornecedor);
+
+        if (indice == -1)
         {
-            if (fornecedor.CNPJ == cnpjFornecedor)
-            {
-                return fornecedor;
-            }
+            throw new Exception("Fornecedor não encontrado");
         }
 
-        throw new Exception("Fornecedor não encontrado");
+        return fornecedores[indice];
     }
 
-    // Método auxiliar responsável por verificar se o fornecedor
-    // está ativo e apto a realizar operações comerciais.
-    private static void ValidarSituacaoFornecedor(Fornecedor fornecedor)
+    // Verifica se o fornecedor está ativo.
+    private static void ValidarSituacaoFornecedor(
+        Fornecedor fornecedor)
     {
-        if (fornecedor.ESituacao != 'A')
+        if (fornecedor.Situacao != ESituacao.A)
         {
             throw new Exception(
                 "Não é possível realizar compras de fornecedores inativos");
         }
     }
 
-    // Método auxiliar responsável por verificar se o CNPJ
-    // do fornecedor consta na lista de bloqueados.
+    // Verifica se o CNPJ consta na lista de fornecedores bloqueados.
     private static void ValidarFornecedorBloqueado(
         List<Bloqueados> bloqueados,
         string cnpjFornecedor)
     {
         foreach (Bloqueados bloqueado in bloqueados)
         {
-            if (bloqueado.CNPJ == cnpjFornecedor)
+            if (bloqueado.Id == cnpjFornecedor)
             {
                 throw new Exception(
                     "Fornecedor está bloqueado para realizar operações comerciais");
@@ -131,8 +240,7 @@ public class Compra : TransacaoComercial
         }
     }
 
-    // Método auxiliar responsável por validar o tempo mínimo
-    // de seis meses de abertura da empresa.
+    // Valida o tempo mínimo de seis meses de abertura da empresa.
     private static void ValidarDataAbertura(
         Fornecedor fornecedor, DateTime dataCompra)
     {
@@ -143,8 +251,7 @@ public class Compra : TransacaoComercial
         }
     }
 
-    // Método auxiliar responsável por gerar o próximo ID
-    // com base no maior identificador cadastrado.
+    // Gera o próximo ID com base no maior identificador cadastrado.
     private static int GerarId(List<Compra> compras)
     {
         int maiorId = 0;
@@ -163,74 +270,5 @@ public class Compra : TransacaoComercial
         }
 
         return maiorId + 1;
-    }
-
-    // Grava todas as compras no arquivo com campos de tamanho fixo.
-    public static void GravarNoArquivo(
-        List<Compra> compras, string caminhoArquivo)
-    {
-        using (StreamWriter sw = new StreamWriter(caminhoArquivo))
-        {
-            foreach (Compra compra in compras)
-            {
-                string id = compra.Id.ToString().PadLeft(5);
-
-                string data = compra.Data.ToString("ddMMyyyy");
-
-                string fornecedor = compra.Fornecedor.PadRight(14);
-
-                string valorTotal = compra.ValorTotal
-                    .ToString("F2", CultureInfo.InvariantCulture)
-                    .PadLeft(8);
-
-                string registro = id + data + fornecedor + valorTotal;
-
-                sw.WriteLine(registro);
-            }
-        }
-    }
-
-    // Carrega as compras gravadas no arquivo.
-    public static List<Compra> CarregarCompras(string caminhoArquivo)
-    {
-        List<Compra> compras = new List<Compra>();
-
-        if (!File.Exists(caminhoArquivo))
-        {
-            return compras;
-        }
-
-        using (StreamReader sr = new StreamReader(caminhoArquivo))
-        {
-            string? linha;
-
-            while ((linha = sr.ReadLine()) != null)
-            {
-                if (linha.Length != 35)
-                {
-                    throw new FormatException("Registro de compra inválido.");
-                }
-
-                int id = int.Parse(linha.Substring(0, 5).Trim());
-
-                DateTime dataCompra = DateTime.ParseExact(
-                    linha.Substring(5, 8),
-                    "ddMMyyyy",
-                    CultureInfo.InvariantCulture);
-
-                string fornecedor = linha.Substring(13, 14).Trim();
-
-                double valorTotal = double.Parse(
-                    linha.Substring(27, 8).Trim(),
-                    CultureInfo.InvariantCulture);
-
-                Compra compra = new Compra(
-                    id, dataCompra, fornecedor, valorTotal);
-
-                compras.Add(compra);
-            }
-        }
-
-        return compras;
     }
 }
