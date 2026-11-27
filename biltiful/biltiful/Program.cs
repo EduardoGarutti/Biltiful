@@ -1,21 +1,16 @@
-﻿List<Cliente> clientes = Cliente.CarregarClientes();
-List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
-List<Produto> produtos = Produto.CarregarProdutos();
-List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
-List<Compra> compras = Compra.CarregarCompras();
-
-string pathInadimplentes = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Riscos.dat"));
+﻿string pathInadimplentes = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Riscos.dat"));
 string pathBloqueados = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Bloqueados.dat"));
 string pathVendas = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Venda.dat"));
 
-List<Cliente> clientes = Cliente.CarregarClientes("Clientes.dat");
-List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores("Fornecedor.dat");
-List<Produto> produtos = Produto.CarregarProdutos("Produto.dat");
-List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriasPrimas("Materia");
-List<string> inadimplentes = Banidos.CarregarArquivo("risco.dat");
-List<string> bloqueados = Banidos.CarregarArquivo("banidos.dat");
-//--------------------------------------------------------------------------------
-List<Venda> vendas = CarregarVendas("Vendas.dat");
+List<Cliente> clientes = Cliente.CarregarClientes();
+List<Fornecedor> fornecedores = Fornecedor.CarregarFornecedores();
+List<Producao> producoes = Producao.CarregarProducoes();
+List<Compra> compras = Compra.CarregarCompras();
+List<Produto> produtos = Produto.CarregarProdutos();
+List<MateriaPrima> materiasPrimas = MateriaPrima.CarregarMateriaPrima();
+List<string> inadimplentes = Banidos.CarregarArquivo(pathInadimplentes);
+List<string> bloqueados = Banidos.CarregarArquivo(pathBloqueados);
+List<Venda> vendas = Venda.CarregarVendas(pathVendas);
 
 void InicializarPrograma()
 {
@@ -47,7 +42,7 @@ void InicializarPrograma()
                 MenuCompras();
                 break;
             case '5':
-                // MenuProducao();
+                MenuProducao();
                 break;
             case '0':
                 GravarNoArquivo();
@@ -171,13 +166,13 @@ void MenuVendas()
     switch (escolha)
     {
         case '1':
-            biltiful.Controller.Vender.RealizarVenda(vendas, clientes, inadimplentes);
+            Vender.Cadastrar(vendas, clientes, inadimplentes);
             break;
         case '2':
-            biltiful.Controller.Vender.Localizar(vendas);
+            Vender.Localizar(vendas);
             break;
         case '3':
-            VendasMenu.Salvar(vendas);
+            Vender.Salvar(vendas);
             break;
         case '0':
             return;
@@ -191,5 +186,19 @@ void MenuCompras()
     Comprar.RealizarCompra(fornecedores, compras, bloqueados, materiasPrimas);
 }
 
+void MenuProducao()
+{
+    Produzir.RealizarProducao(producoes, materiasPrimas);
+}
     
+void GravarNoArquivo()
+{ 
+    Cliente.GravarNoArquivo(clientes);
+    Fornecedor.GravarNoArquivo(fornecedores);
+    Producao.SalvarArquivoProducao(producoes);
+    Produto.GravarNoArquivo(produtos);
+    MateriaPrima.GravarNoArquivo(materiasPrimas);
+    Banidos.GravarNoArquivo(inadimplentes, pathInadimplentes);
+    Banidos.GravarNoArquivo(bloqueados, pathBloqueados);
+    Venda.GravarNoArquivo(vendas, pathVendas);
 }
