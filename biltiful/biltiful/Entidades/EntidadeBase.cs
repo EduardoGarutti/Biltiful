@@ -18,10 +18,10 @@ public abstract class EntidadeBase
        
     }
 
-    public static bool ValidarData(DateTime data)
+    public static bool ValidarData(string data)
     {
-        string dataConvertida = data.ToString("dd/MM/yyyy");
-        bool EhValido = Regex.IsMatch(dataConvertida, @"^\d{2}\/\d{2}\/\d{4}$");
+        //Verifica se a string da data recebida correponde a 2 números, uma barra, 2 números, uma barra e 4 números
+        bool EhValido = Regex.IsMatch(data, @"^\d{2}\/\d{2}\/\d{4}$");
         if (!EhValido) throw new Exception("Data ou formato inválido");
         return true;
 

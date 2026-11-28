@@ -10,33 +10,37 @@ public class Cliente : EntidadeBase
     public DateTime DataNascimento { get; set; }
     public char Sexo { get; set; }
 
-    public Cliente(string cpf, string nome, DateTime dataNascimento, char sexo)
+    public Cliente(string cpf, string nome, string dataNascimento, char sexo)
     {
         this.CPF = cpf;
         this.Nome = nome;
-        this.DataNascimento = dataNascimento;
+        this.DataNascimento = DateTime.ParseExact(dataNascimento, "dd/MM/yyyy", CultureInfo.InvariantCulture); 
         this.Sexo = sexo;
     }
+
     public static List<Cliente> CarregarClientes()
     {
         Utils.ValidarCaminho(CaminhoArquivo);
 
         List<Cliente> listaClientes = new List<Cliente>();
 
-        string[] clientes = File.ReadAllLines(CaminhoArquivo);
+        //Pega todos os clientes do arquivo guardando cada linha/cliente como um item num vetor
+        string[] clientes = File.ReadAllLines(CaminhoArquivo); 
 
+        //Para cada linha/cliente pego, desmembra a linha pegando os dados pelos indices que estão posicionados, os atribui em variaveis também convertendo se necessário, cria um objeto novo com essas informações e então adiciona na lista que será retornada
         foreach (var cliente in clientes)
         {
-            string cpf = cliente.Substring(0, 14);
-            string nome = cliente.Substring(14, 64);
-            DateTime nascimento = DateTime.ParseExact(cliente.Substring(64, 74), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            char sexo = cliente[74];
+            string cpf = cliente.Substring(0, 11);
+            string nome = cliente.Substring(11, 61).TrimEnd();
+            string nascimento = cliente.Substring(61, 71);
+            char sexo = cliente[71];
 
             Cliente clienteCarregado = new Cliente(cpf, nome, nascimento, sexo);
 
-            clienteCarregado.DataUltimaCompra = DateTime.ParseExact(cliente.Substring(75, 85), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            clienteCarregado.DataCadastro = DateTime.ParseExact(cliente.Substring(85, 95), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            clienteCarregado.Situacao = Enum.Parse<ESituacao>(cliente[95].ToString());
+            //Esses dados são inseridos após a instanciação pois não são atribuidos pelo construtor mas sim gerados automaticamente pela classe base, e são informações variaveis que são alteradas por outros métodos 
+            clienteCarregado.DataUltimaCompra = DateTime.ParseExact(cliente.Substring(72, 82), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            clienteCarregado.DataCadastro = DateTime.ParseExact(cliente.Substring(82, 92), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            clienteCarregado.Situacao = Enum.Parse<ESituacao>(cliente[92].ToString());
 
             listaClientes.Add(clienteCarregado);
         }
@@ -44,39 +48,54 @@ public class Cliente : EntidadeBase
         return listaClientes;
     }
 
-    public static Cliente CadastrarCliente(List<Cliente> lista, string cpf, string nome, DateTime nascimento, char sexo, bool Editando = false)
+    public static Cliente CadastrarCliente(List<Cliente> lista, string cpf, string nome, string nascimento, char sexo, bool Editando = false)
     {
+        //Remoção de possíveis espaçoes e caracteres especiais para garantir padronizãção de tamanho e formato
+        cpf = cpf.TrimEnd().TrimStart();
+        nome = nome.TrimEnd().TrimStart();
+        nascimento = nascimento.TrimEnd().TrimStart();
 
+        //Se já existir um cliente com esse CPF e a ação não é de edição mas criação, retorna uma exceção
         if (LocalizarCliente(lista, cpf) != -1 && !Editando) throw new Exception("Já existe um cliente com esse CPF");
+        //Se não existir um cliente com esse CPF e a ação for de edição, retorna uma exceção
         if (LocalizarCliente(lista, cpf) == -1 && Editando) throw new Exception("Não existe um cliente com esse CPF");
-
+        
         ValidarCPF(cpf);
         ValidarNome(nome);
         ValidarData(nascimento);
         ValidarSexo(sexo);
+
+        //Remove todos os caracteres especiais para então instanciar um objeto 
+        cpf = Regex.Replace(cpf, @"\.||\-", "");
+
 
         return new Cliente(cpf, nome, nascimento, sexo);
     }
 
     public static int LocalizarCliente(List<Cliente> lista, string cpf)
     {
-        Cliente clienteComCPFExistente = lista.Find(cliente => cliente.CPF == cpf);
+        //Verifica se já há um cliente com o CPF informado
+        Cliente? clienteComCPFExistente = lista.Find(cliente => cliente.CPF == cpf);
 
-        if (lista.Contains(clienteComCPFExistente)) return lista.IndexOf(clienteComCPFExistente);
+        //Se exisitr um cliente, retorna o índice dele na lista, se não, retorna -1
+        if (clienteComCPFExistente != null) return lista.IndexOf(clienteComCPFExistente);
         else return -1;
     }
 
-    public static Cliente EditarCliente(List<Cliente> lista, string cpf, string novoNome, DateTime novaDataNascimento, char novoSexo)
+    public static Cliente EditarCliente(List<Cliente> lista, string cpf, string novoNome, string novaDataNascimento, char novoSexo)
     {
+        //Autoexplicativo
         return CadastrarCliente(lista, cpf, novoNome, novaDataNascimento, novoSexo, true);
     }
 
     public static void GravarNoArquivo(List<Cliente> clientes)
     {
-
+        //Cria um fluxo de escrita habilitado para adicionar ao invés de substituir
         var writer = new StreamWriter(CaminhoArquivo, true);
+        //Limpa o arquivo
         File.WriteAllText(CaminhoArquivo, "");
 
+        //Para cada objeto cliente na lista, pega suas propriedades e coloca formatado numa string que vai representar sua linha no arquivo e então adiciona no arquivo
         foreach (var cliente in clientes)
         {
             string informacoesDoCliente = $"{cliente.CPF}" +
@@ -94,9 +113,23 @@ public class Cliente : EntidadeBase
         writer.Close();
     }
 
+    public static bool EhMenorDeIdade(Cliente cliente)
+    {
+        //Pega a idade em anos sem considerar meses ou dias
+        DateTime hoje = DateTime.Today;
+        int idade = hoje.Year - cliente.DataNascimento.Year;
+
+        //Se o mês e dia do nascimento, sem considerar o ano, for maior que o mês e dia de hoje, subtrai 1 ano pois esse ano o cliente ainda não fez aniversário(peguei do Lucas)
+        if (cliente.DataNascimento.Date > hoje.AddYears(-idade).Date) idade--;
+
+        if (idade < 18) return true;
+        else return false;
+    }
+
     public static bool ValidarSexo(char sexo)
     {
         string sexoFormatado = sexo.ToString().ToLower();
+
         if (sexoFormatado != "m" || sexoFormatado != "f") throw new Exception("Sexo inválido!");
 
         return true;
@@ -104,10 +137,12 @@ public class Cliente : EntidadeBase
 
     public static bool ValidarCPF(string cpf)
     {
-        bool EhValido = Regex.IsMatch(cpf, @"^(\d{3}\.){2}\d{3}\-\d{2}$");
+        //Verifica se o CPF segue a formatação de: 3 números, um ponto opcional, 3 números, um ponto opcional, 3 números, um traço opcioal e 2 números
+        bool EhValido = Regex.IsMatch(cpf, @"^(\d{3}\.?){2}\d{3}\-?\d{2}$");
         if (!EhValido) throw new Exception("O CPF não está no formato correto");
-
-        string digitosIniciais = cpf[0..11].Replace(".", "");
+        
+        //Pega os 9 dígitos antes do traço e verifica se eles são todos iguais
+        string digitosIniciais = cpf.Replace(".", "")[0..9];
         for (int n = 1; n < digitosIniciais.Length; n++)
         {
             if (digitosIniciais[n - 1] == digitosIniciais[n])
@@ -123,11 +158,12 @@ public class Cliente : EntidadeBase
 
         if (!EhValido) throw new Exception("O CPF não é válido! Todos os primeiros 9 dígitos são iguais");
 
-        string digitosFinais = cpf[12..];
+        string digitosFinais = cpf.Replace("-", "")[9..];
         int soma;
         int indiceDigitosIniciais;
         int indiceNumerosFinais = 0;
 
+        //Pesquisa as fórmulas e métodos pra validar CPF amigão 
         foreach (var digito in digitosFinais)
         {
             soma = 0;
@@ -154,8 +190,10 @@ public class Cliente : EntidadeBase
                     break;
             }
 
-            if (digitosFinais[indiceNumerosFinais] != cpf[12 + indiceNumerosFinais]) throw new Exception("O CPF não é válido! Os dígitos verificadores não correspondem aos 9 primeiros");
+            //Verifica se os 2 últimos dígitos correspondem aos outros 9 de acordo com a fórmula
+            if (digitosFinais[indiceNumerosFinais] != cpf[9 + indiceNumerosFinais]) throw new Exception("O CPF não é válido! Os dígitos verificadores não correspondem aos 9 primeiros");
 
+            //Adiciona o primeiro dígito(e também o segundo, mas não importa) pós traço já validado aos dígitos que serão usados para validação 
             digitosIniciais += digitosFinais[indiceNumerosFinais];
 
             indiceNumerosFinais++;
@@ -164,6 +202,9 @@ public class Cliente : EntidadeBase
         return true;
     }
 
-
+    public override string ToString()
+    {
+        return $"CPF: {this.CPF}\nNome: {this.Nome}\nData de nascimento: {this.DataNascimento}\nSexo: {this.Sexo}\nData do cadastro: {this.DataCadastro}\nData da última compra: {this.DataUltimaCompra}\nSituação: {this.Situacao}";
+    }
 
 }
