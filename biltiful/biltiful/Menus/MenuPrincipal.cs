@@ -36,7 +36,20 @@ public class MenuPrincipal
                 Pausar("ACESSO NEGADO. O usuário atual não possui permissão.");
                 continue;
             }
-            Pausar($"Módulo {m} iniciado. Integre aqui as funcionalidades do grupo.");
+            switch (m)
+            {
+                case Modulos.Administracao:
+                    break;
+
+                case Modulos.Producao:
+                    break;
+
+                case Modulos.Vendas:
+                    break;
+
+                case Modulos.Compras:
+                    break;
+            }
         }
     }
     private static void Pausar(string t)
