@@ -71,7 +71,7 @@
         }
     }
 
-    static public void Remover(List<string> lista, string id, string arquivo)
+    static public void Remover(List<string> lista, string id)
     {
 
         try
@@ -80,8 +80,6 @@
             {
                 throw new Exception("Banido não encontrado");
             }
-
-            GravarNoArquivo(lista, arquivo);
 
         }
         catch (Exception ex)

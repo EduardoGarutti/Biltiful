@@ -1,7 +1,52 @@
-﻿using System.Globalization;
+﻿using biltiful.Services;
+using System.Globalization;
 
 public static class ClienteController
 {
+    public static void GerenciarCliente(SistemaService allLists)
+    {
+        while (true)
+        {
+            var escolha = Utils.CriarMenu(new List<string>(){
+                "============CLIENTE============\n",
+                "[1] - Cadastrar Cliente\n",
+                "[2] - Consultar Cliente\n",
+                "[3] - Editar Cliente\n",
+                "[4] - Excluir Cliente\n",
+                "[5] - Cadastrar Inadimplente\n",
+                "[6] - Remover Inadimplente\n",
+                "[0] - Voltar\n",
+                "================================\n"
+                });
+
+            switch (escolha)
+            {
+                case '1':
+                    CadastrarCliente(allLists.Clientes);
+                    break;
+                case '2':
+                    ImprimirClientes(allLists.Clientes);
+                    break;
+                case '3':
+                    EditarCliente(allLists.Clientes);
+                    break;
+                case '4':
+                    ExcluirCliente(allLists.Clientes);
+                    break;
+                case '5':
+                    CadastrarInadimplente(allLists.Inadimplentes, allLists.Clientes);
+                    break;
+                case '6':
+                    RemoverInadimplente(allLists.Inadimplentes);
+                    break;
+                case '0':
+                    return;
+                default:
+                    Console.WriteLine("Opção Invalida!");
+                    break;
+            }
+        }
+    }
     public static void CadastrarCliente(List<Cliente> clientes)
     {
         try
@@ -143,8 +188,8 @@ public static class ClienteController
                 }
             }
             clientes[id] = Cliente.EditarCliente(clientes, cpf, nome, dataNasc, sexo);
-        } 
-        catch(Exception e)
+        }
+        catch (Exception e)
         {
             Console.WriteLine("Erro: " + e.Message);
             if (Utils.TentarNovamente())
@@ -152,7 +197,7 @@ public static class ClienteController
                 Console.WriteLine("Reiniciando Processo de Edição...");
                 EditarCliente(clientes);
             }
-        }   
+        }
     }
 
     public static void ImprimirClientes(List<Cliente> clientes)
@@ -187,6 +232,24 @@ public static class ClienteController
             {
                 Console.WriteLine("Reiniciando Processo de Cadastro...");
                 CadastrarInadimplente(inadimplentes, clientes);
+            }
+        }
+    }
+
+    public static void RemoverInadimplente(List<string> inadimplentes)
+    {
+        try
+        {
+            Console.WriteLine("Informe cpf do cliente a ser removido: ");
+            string cpf = Console.ReadLine();
+
+            Banidos.Remover(inadimplentes, cpf);
+        } catch(Exception e)
+        {
+            Console.WriteLine("Erro: "e.Message);
+            if (Utils.TentarNovamente())
+            {
+                RemoverInadimplente(inadimplentes);
             }
         }
     }

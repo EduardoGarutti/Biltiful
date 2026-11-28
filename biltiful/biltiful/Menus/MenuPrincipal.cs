@@ -39,6 +39,7 @@ public class MenuPrincipal
             switch (m)
             {
                 case Modulos.Administracao:
+                    MenuAdministracao.Menu(allLists);
                     break;
 
                 case Modulos.Producao:

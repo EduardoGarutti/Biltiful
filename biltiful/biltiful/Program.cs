@@ -221,8 +221,10 @@ while (true)
     var login = Console.ReadLine() ?? "";
 
     if (login.Equals("SAIR", StringComparison.OrdinalIgnoreCase))
+    {
+        allLists.SalvarDados();
         break;
-
+    }
     Console.Write("Senha: ");
     var senha = Console.ReadLine() ?? "";
 
