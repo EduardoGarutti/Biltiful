@@ -109,7 +109,7 @@
         while (true)
         {
             var op = Utils.CriarMenu(new List<string>(){
-            "Deseja tentar o cadastro novamente?\n",
+            "Deseja tentar novamente?\n",
             "[1] - Sim\n",
             "[2] - Não"
     });
