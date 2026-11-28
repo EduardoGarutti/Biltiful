@@ -6,8 +6,6 @@
     public DateOnly UltimaCompra { get; set; }
     public DateOnly DataCadastro { get; set; }
     public ESituacao Situacao { get; set; }
-
-    
     public MateriaPrima()
     {
 
@@ -26,10 +24,7 @@
 
     }
 
-
     public static readonly string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "materiaPrima.dat");
-
-
     public static List<MateriaPrima> CarregarMateriaPrima() //retorna todos as materias primas, ativas e inativas
     {
 
@@ -55,8 +50,6 @@
         return lista;
 
     }
-
-
     public static MateriaPrima CadastrarMateriaPrima(List<MateriaPrima> materias, string nome)
     {
 
@@ -72,9 +65,6 @@
             return materiaPrima;
 
     }
-
-
-
     public static int LocalizarMateria(List<MateriaPrima> materias, string id)
     {
         foreach (var materia in materias)
@@ -87,8 +77,6 @@
 
         return -1;
     }
-
-
     public static List<MateriaPrima> ListarMateriasPrimasAtivas(List<MateriaPrima> materias)
     {
         var ativas = new List<MateriaPrima>();
@@ -103,8 +91,6 @@
 
         return ativas;
     }
-
-
     public static List<MateriaPrima> ListarMateriasPrimasInativas(List<MateriaPrima> materias)
     {
         var ativas = new List<MateriaPrima>();
@@ -119,8 +105,6 @@
 
         return ativas;
     }
-
-
     public void AlterarSituacao(string id)
     {
         var lista = CarregarMateriaPrima();
@@ -143,7 +127,6 @@
 
 
     }
-
     void SetNome(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))
@@ -158,7 +141,6 @@
         Nome = nome;
 
     }
-
     public static void GravarNoArquivo(List<MateriaPrima> materias)
     {
 
@@ -173,15 +155,10 @@
         writer.Close();
 
     }
-
     public string ToFile()
     {
         return $"{Nome.PadRight(20)}{Id}{DataCadastro}{UltimaCompra}{Situacao}";
     }
-
-
-
-
     public override string ToString()
     {
         return $"""
