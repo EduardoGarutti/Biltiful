@@ -5,32 +5,7 @@ public class Cadastrar()
 {
 
     
-    public static void CadastrarFornecedor(List<Fornecedor> fornecedores)
-    {
-        try
-        {
-
-            Console.WriteLine("Informe CNPJ do Fornecedor: ");
-            string cnpj = Console.ReadLine();
-
-            Console.WriteLine("Informe Razão Social do Fornecedor: ");
-            string razaoSocial = Console.ReadLine();
-
-            Console.WriteLine("Informe a data de Abertura da empresa: (dd/MM/yyyy)");
-            string data = Console.ReadLine();
-
-            fornecedores.Add(Fornecedor.CadastrarFornecedor(fornecedores, cnpj, razaoSocial, data));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Erro: " + e.Message);
-            if (Utils.TentarNovamente())
-            {
-                Console.WriteLine("Reiniciando Processo de Cadastro...");
-                CadastrarFornecedor(fornecedores);
-            }
-        }
-    }
+    
     public static void CadastrarProduto(List<Produto> produtos)
     {
         try

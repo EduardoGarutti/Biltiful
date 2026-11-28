@@ -6,9 +6,8 @@ public static class ClienteController
     {
         try
         {
-            string cpf;
             Console.WriteLine("Informe CPF do Cliente: ");
-            cpf = Console.ReadLine();
+            string cpf = Console.ReadLine();
 
             Console.WriteLine("Informe o nome do Cliente: ");
             string nome = Console.ReadLine();
@@ -179,7 +178,7 @@ public static class ClienteController
 
             int id = LocalizarCliente(clientes, cpf);
 
-            Banidos.Cadastrar(inadimplentes, cpf, "risco.dat");
+            Banidos.Cadastrar(inadimplentes, cpf, Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Risco.dat")));
         }
         catch (Exception e)
         {
