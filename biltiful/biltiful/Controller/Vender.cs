@@ -27,8 +27,8 @@ public class Vender
                 Console.WriteLine(prod);
             }
 
-            decimal valorDaVenda = 0;
-            List<Produto> produtosDaCompra = new List<Produto>();
+                decimal valorDaVenda = 0;
+                List<ItemVenda> produtosDaCompra = new List<ItemVenda>();
 
             do
             {
@@ -37,10 +37,10 @@ public class Vender
 
                 int indiceProd = Produto.LocalizarProduto(produtos, codigoDeBarra);
 
-                if (indiceProd == null && indiceProd == -1)
-                {
-                    throw new Exception("Produto não encontrado");
-                }
+                    if (indiceProd == -1)
+                    {
+                        throw new Exception("Produto não encontrado");
+                    }
 
                 Console.WriteLine("Quantidade de venda");
                 int quantVenda = int.Parse(Console.ReadLine());
@@ -51,36 +51,49 @@ public class Vender
 
                 }
 
-                Produto produtoAtualDaCompra = produtos[indiceProd];
-                valorDaVenda += produtoAtualDaCompra.ValorVenda;
+                  
+                    if (quantidadeDeProdutos < 3) {
+                        Console.WriteLine("Deseja adicionar mais produtos? (s/n)");
+                        char resposta = char.Parse(Console.ReadLine().ToLower());
 
-                if (quantidadeDeProdutos < 2)
-                {
-                    Console.WriteLine("Deseja adicionar mais produtos?");
-                }
+                        if(resposta == 'n')
+                        {
+                            usuarioQuerContinuar = false;
+                        }
+                        
+                    }
 
-                produtosDaCompra.Add(produtoAtualDaCompra);
+                    ItemVenda produtoAtualDaCompra = new ItemVenda();
+
+                    produtoAtualDaCompra.ProdutoId = produtos[indiceProd].CodigoBarras;
+                    produtoAtualDaCompra.Quantidade = quantVenda;
+
+                    valorDaVenda += produtoAtualDaCompra.ValorUnitario * quantVenda;
+
+                    produtosDaCompra.Add(produtoAtualDaCompra);
 
             } while (quantidadeDeProdutos < 3 || usuarioQuerContinuar);
 
             Venda vendaAtual = Venda.CadastrarVenda(clientes, cpf, valorDaVenda);
 
-            foreach (Produto item in produtosDaCompra)
-            {
+                foreach (ItemVenda item in produtosDaCompra) {
 
-                ItemVenda.CadastrarItemVenda(itemVendas, vendas, produtos, vendaAtual.Id, item.CodigoBarras, 1);
+                    ItemVenda.CadastrarItemVenda(itemVendas, vendas, produtos,vendaAtual.Id, item.ProdutoId, item.Quantidade);
+                        
+                }
+
+                Console.WriteLine("Comprar realizada");
 
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Erro: " + ex.Message);
-            if (Utils.TentarNovamente())
+            catch (Exception ex)
             {
-                Cadastrar(vendas, clientes, inadimplentes);
+                Console.WriteLine("Erro: " + ex.Message);
+                if (Utils.TentarNovamente())
+                {
+                    Cadastrar(vendas, clientes, inadimplentes);
+                }
             }
         }
-    }
 
     public static void Localizar(List<Venda> vendas)
     {
