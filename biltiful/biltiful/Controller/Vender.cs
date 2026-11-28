@@ -1,116 +1,135 @@
 ﻿
-public class Vender
+namespace biltiful
+
 {
-    public static void Cadastrar(List<Venda> vendas, List<Cliente> clientes, List<string> inadimplentes)
+    public class VendasMenu
     {
-        List<ItemVenda> itemVendas = ItemVenda.CarregarItensVenda("");
 
-        int quantidadeDeProdutos = 0;
-        bool usuarioQuerContinuar = true;
-        try
+
+        public static void Cadastrar(List<Venda> vendas, List<Cliente> clientes, List<string> inadimplentes)
         {
-            Console.WriteLine("Digite o CPF do cliente");
-            string cpf = Console.ReadLine();
+            List<ItemVenda> itemVendas = ItemVenda.CarregarItensVenda("");
 
-            if (Cliente.LocalizarCliente(clientes, cpf) == -1)
+            int quantidadeDeProdutos = 0;
+            bool usuarioQuerContinuar = true;
+            try
             {
-                throw new Exception("Cliente não encontrando");
-            }
-            if (Banidos.Localizar(inadimplentes, cpf))
-            {
-                throw new Exception("Cliente esta banido");
-            }
+                Console.WriteLine("Digite o CPF do cliente");
+                string cpf = Console.ReadLine();
 
-            List<Produto> produtos = Produto.ProdutoAtivos();
-            foreach (Produto prod in produtos)
-            {
-                Console.WriteLine(prod);
-            }
-
-            decimal valorDaVenda = 0;
-            List<Produto> produtosDaCompra = new List<Produto>();
-
-            do
-            {
-                Console.WriteLine("Digite o codigo de barra");
-                string codigoDeBarra = Console.ReadLine();
-
-                int indiceProd = Produto.LocalizarProduto(produtos, codigoDeBarra);
-
-                if (indiceProd == null && indiceProd == -1)
+                if (Cliente.LocalizarCliente(clientes, cpf) == -1)
                 {
-                    throw new Exception("Produto não encontrado");
+                    throw new Exception("Cliente não encontrando");
+                }
+                if (Banidos.Localizar(inadimplentes, cpf))
+                {
+                    throw new Exception("Cliente esta banido");
                 }
 
-                Console.WriteLine("Quantidade de venda");
-                int quantVenda = int.Parse(Console.ReadLine());
-
-                if (quantVenda <= 0)
+                List<Produto> produtos = Produto.ProdutoAtivos();
+                foreach (Produto prod in produtos)
                 {
-                    throw new Exception("Compra não pode ser menor que 0");
-
+                    Console.WriteLine(prod);
                 }
 
-                Produto produtoAtualDaCompra = produtos[indiceProd];
-                valorDaVenda += produtoAtualDaCompra.ValorVenda;
+                decimal valorDaVenda = 0;
+                List<ItemVenda> produtosDaCompra = new List<ItemVenda>();
 
-                if (quantidadeDeProdutos < 2)
+                do
                 {
-                    Console.WriteLine("Deseja adicionar mais produtos?");
+                    Console.WriteLine("Digite o codigo de barra");
+                    string codigoDeBarra = Console.ReadLine();
+
+                    int indiceProd = Produto.LocalizarProduto(produtos, codigoDeBarra);
+
+                    if (indiceProd == -1)
+                    {
+                        throw new Exception("Produto não encontrado");
+                    }
+
+                    Console.WriteLine("Quantidade de venda");
+                    int quantVenda = int.Parse(Console.ReadLine());
+
+                    if(quantVenda <= 0)
+                    {
+                        throw new Exception("Compra não pode ser menor que 0");
+
+                    }
+
+                  
+                    if (quantidadeDeProdutos < 3) {
+                        Console.WriteLine("Deseja adicionar mais produtos? (s/n)");
+                        char resposta = char.Parse(Console.ReadLine().ToLower());
+
+                        if(resposta == 'n')
+                        {
+                            usuarioQuerContinuar = false;
+                        }
+                        
+                    }
+
+                    ItemVenda produtoAtualDaCompra = new ItemVenda();
+
+                    produtoAtualDaCompra.ProdutoId = produtos[indiceProd].CodigoBarras;
+                    produtoAtualDaCompra.Quantidade = quantVenda;
+
+                    valorDaVenda += produtoAtualDaCompra.ValorUnitario * quantVenda;
+
+                    produtosDaCompra.Add(produtoAtualDaCompra);
+
+                } while (quantidadeDeProdutos < 3 || usuarioQuerContinuar);
+
+                Venda vendaAtual = Venda.CadastrarVenda(clientes, cpf, valorDaVenda);
+
+                foreach (ItemVenda item in produtosDaCompra) {
+
+                    ItemVenda.CadastrarItemVenda(itemVendas, vendas, produtos,vendaAtual.Id, item.ProdutoId, item.Quantidade);
+                        
                 }
 
-                produtosDaCompra.Add(produtoAtualDaCompra);
-
-            } while (quantidadeDeProdutos < 3 || usuarioQuerContinuar);
-
-            Venda vendaAtual = Venda.CadastrarVenda(clientes, cpf, valorDaVenda);
-
-            foreach (Produto item in produtosDaCompra)
-            {
-
-                ItemVenda.CadastrarItemVenda(itemVendas, vendas, produtos, vendaAtual.Id, item.CodigoBarras, 1);
+                Console.WriteLine("Comprar realizada");
 
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Erro: " + ex.Message);
-            if (Utils.TentarNovamente())
+            catch (Exception ex)
             {
-                Cadastrar(vendas, clientes, inadimplentes);
+                Console.WriteLine("Erro: " + ex.Message);
+                if (Utils.TentarNovamente())
+                {
+                    Cadastrar(vendas, clientes, inadimplentes);
+                }
             }
         }
-    }
 
-    public static void Localizar(List<Venda> vendas)
-    {
-        try
+        public static void Localizar(List<Venda> vendas)
         {
-            Console.WriteLine("Digite o ID da venda que deseja localizar");
-            int idvenda = int.Parse(Console.ReadLine());
-            int indiceVenda = Venda.LocalizarVenda(vendas, idvenda);
-            Console.WriteLine(vendas[indiceVenda]);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Erro: " + ex.Message);
-            if (Utils.TentarNovamente())
+            try
             {
-                Localizar(vendas);
+                Console.WriteLine("Digite o ID da venda que deseja localizar");
+                int idvenda = int.Parse(Console.ReadLine());
+                int indiceVenda = Venda.LocalizarVenda(vendas, idvenda);
+                Console.WriteLine(vendas[indiceVenda]);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro: " + ex.Message);
+                if (Utils.TentarNovamente())
+                {
+                    Localizar(vendas);
+                }
             }
         }
-    }
 
-    public static void Salvar(List<Venda> vendas, string arquivo)
-    {
-        try
+        public static void Salvar(List<Venda> vendas, string arquivo)
         {
-            Console.WriteLine("Iniciando processo de registro");
-            Venda.GravarNoArquivo(vendas, arquivo);
-        }
-        catch
-        {
-            Console.WriteLine("Erro: ");
+            try
+            {
+                Console.WriteLine("Iniciando processo de registro");
+                Venda.GravarNoArquivo(vendas, arquivo);
+            }
+            catch
+            {
+
+            }
         }
     }
 }

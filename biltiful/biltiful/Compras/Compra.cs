@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 public class Compra : TransacaoComercial
 {
-    public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Compra.dat"));
     // Armazena o CNPJ do fornecedor responsável pela compra.
     public string Fornecedor { get; private set; }
 
@@ -33,6 +33,10 @@ public class Compra : TransacaoComercial
         List<Fornecedor> fornecedores,
         List<string> bloqueados)
     {
+
+        // Normaliza o CNPJ antes de realizar as validações.
+        cnpjFornecedor = Regex.Replace(cnpjFornecedor, @"\D", "");
+
         Fornecedor fornecedor = BuscarFornecedor(
             fornecedores, cnpjFornecedor);
 
@@ -91,11 +95,11 @@ public class Compra : TransacaoComercial
 
     // Grava todas as compras no arquivo com campos de tamanho fixo.
     public static void GravarNoArquivo(
-        List<Compra> compras)
+        List<Compra> compras, string caminhoArquivo)
     {
         // O using garante o descarte do StreamWriter
         // ao finalizar a operação.
-        using (StreamWriter sw = new StreamWriter(CaminhoArquivo))
+        using (StreamWriter sw = new StreamWriter(caminhoArquivo))
         {
             foreach (Compra compra in compras)
             {
@@ -118,18 +122,18 @@ public class Compra : TransacaoComercial
     }
 
     // Carrega as compras gravadas no arquivo.
-    public static List<Compra> CarregarCompras()
+    public static List<Compra> CarregarCompras(string caminhoArquivo)
     {
         // A lista será preenchida com os objetos recuperados do arquivo.
         List<Compra> compras = new List<Compra>();
 
         // Caso o arquivo não exista, retorna uma lista vazia.
-        if (!File.Exists(CaminhoArquivo))
+        if (!File.Exists(caminhoArquivo))
         {
             return compras;
         }
 
-        using (StreamReader sr = new StreamReader(CaminhoArquivo))
+        using (StreamReader sr = new StreamReader(caminhoArquivo))
         {
             string? linha;
 
@@ -228,16 +232,13 @@ public class Compra : TransacaoComercial
 
     // Verifica se o CNPJ consta na lista de fornecedores bloqueados.
     private static void ValidarFornecedorBloqueado(
-        List<string> bloqueados,
-        string cnpjFornecedor)
+    List<string> bloqueados,
+    string cnpjFornecedor)
     {
-        foreach (var bloqueado in bloqueados)
+        if (Banidos.Localizar(bloqueados, cnpjFornecedor))
         {
-            if (bloqueado == cnpjFornecedor)
-            {
-                throw new Exception(
-                    "Fornecedor está bloqueado para realizar operações comerciais");
-            }
+            throw new Exception(
+                "Fornecedor está bloqueado para realizar operações comerciais");
         }
     }
 
