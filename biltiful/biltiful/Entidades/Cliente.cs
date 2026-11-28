@@ -17,6 +17,7 @@ public class Cliente : EntidadeBase
         this.DataNascimento = dataNascimento;
         this.Sexo = sexo;
     }
+
     public static List<Cliente> CarregarClientes()
     {
         Utils.ValidarCaminho(CaminhoArquivo);
@@ -48,7 +49,7 @@ public class Cliente : EntidadeBase
     {
 
         if (LocalizarCliente(lista, cpf) != -1 && !Editando) throw new Exception("Já existe um cliente com esse CPF");
-        //if (LocalizarCliente(lista, cpf) == -1 && Editando) throw new Exception("Não existe um cliente com esse CPF");
+        if (LocalizarCliente(lista, cpf) == -1 && Editando) throw new Exception("Não existe um cliente com esse CPF");
 
         ValidarCPF(cpf);
         ValidarNome(nome);

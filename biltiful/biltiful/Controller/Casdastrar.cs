@@ -4,69 +4,7 @@ using System.Text.RegularExpressions;
 public class Cadastrar()
 {
 
-    public static void CadastrarCliente(List<Cliente> clientes)
-    {
-        try
-        {
-            string cpf;
-            Console.WriteLine("Informe CPF do Cliente: ");
-            cpf = Console.ReadLine();
-
-            Console.WriteLine("Informe o nome do Cliente: ");
-            string nome = Console.ReadLine();
-
-            string[] formatosDeData = { "dd/MM/yyyy", "ddMMyyyy" };
-            DateTime dataNasc;
-            string entrada;
-
-            Console.WriteLine("Informe a data de nascimento (dd/MM/yyyy)");
-            entrada = Console.ReadLine();
-
-
-            while (!DateTime.TryParseExact(entrada, formatosDeData, CultureInfo.InvariantCulture, DateTimeStyles.None, out dataNasc))
-            {
-                Console.WriteLine("Data no formato Invalido! informe novamente: ");
-                entrada = Console.ReadLine();
-            }
-
-            bool sexoValido = false;
-            char sexo = '0';
-
-            while (!sexoValido)
-            {
-                var opcao = Utils.CriarMenu(new List<string> {
-            "[1] - Masculino",
-            "[2] - Feminimo",
-            });
-
-                switch (opcao)
-                {
-                    case '1':
-                        sexo = 'M';
-                        sexoValido = true;
-                        break;
-                    case '2':
-                        sexo = 'F';
-                        sexoValido = true;
-                        break;
-                    default:
-                        Console.WriteLine("Sexo Invalido! Informe novamente:");
-                        break;
-                }
-            }
-
-            clientes.Add(Cliente.CadastrarCliente(clientes, cpf, nome, dataNasc, sexo));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Erro: " + e.Message);
-            if (Utils.TentarNovamente())
-            {
-                Console.WriteLine("Reiniciando Processo de Cadastro...");
-                CadastrarCliente(clientes);
-            }
-        }
-    }
+    
     public static void CadastrarFornecedor(List<Fornecedor> fornecedores)
     {
         try
