@@ -36,6 +36,9 @@ namespace biltiful.Controller
                 }
 
                 produtos.Add(Produto.CadastrarProduto(produtos, codigoDeBarras, nomeProduto, valorVenda));
+
+                Console.WriteLine("Cadastro realizado com sucesso");
+
             }
             catch (Exception e)
             {
@@ -45,6 +48,8 @@ namespace biltiful.Controller
                     Console.WriteLine("Reiniciando Processo de Cadastro...");
                     CadastrarProduto(produtos);
                 }
+
+                return;
             }
 
         }
@@ -52,9 +57,28 @@ namespace biltiful.Controller
         public static void ImprimirProduto(List<Produto> produtos)
         {
 
-            Consultar.Consulta(produtos);
-            Console.WriteLine("Precione enter para continuar");
+            Console.WriteLine("Deseja imprimir qual status de produto:");
+           var escolha =  Utils.CriarMenu(new List<string> { 
+                "[1] - Ativos",
+                "[2] - Inativos",
+                "[3] - Todos"
+            });
+
+            switch (escolha) {
+                case '1':
+                    Consultar.Consulta(Produto.ProdutoAtivos());
+                    break;
+                case '2':
+                    Consultar.Consulta(Produto.ProdutosInativos());
+                    break;
+                case '3':
+                    Consultar.Consulta(Produto.CarregarProdutos());
+                    break;
+            }
+
+            Console.WriteLine("Precione ENTER para continuar");
             Console.ReadKey();
+
 
         }
 
@@ -83,7 +107,12 @@ namespace biltiful.Controller
                     LocalizarProduto(produtos);
                 }
 
+                return;
+
             }
+
+            Console.WriteLine("Precione ENTER para continuar");
+            Console.ReadKey();
         }
 
         public static void ExcluirProduto(List<Produto> produtos)
@@ -98,6 +127,9 @@ namespace biltiful.Controller
                 int id = Produto.LocalizarProduto(produtos, codBarra);
 
                 produtos[id].AlterarSituacao(codBarra);
+
+                Console.WriteLine("Exclusão realizada com sucesso, precione ENTER para continuar");
+                Console.ReadKey();
             }
             catch (Exception e)
             {
@@ -107,6 +139,8 @@ namespace biltiful.Controller
                     Console.WriteLine("Reiniciando Processo de Exclusão...");
                     ExcluirProduto(produtos);
                 }
+
+                return;
             }
         }
 
@@ -132,6 +166,9 @@ namespace biltiful.Controller
                 }
 
                 Produto.EditarProduto(codBarra, nomeProduto, valorVenda);
+
+                Console.WriteLine("Edição realizada com sucesso, precione ENTER para continuar");
+                Console.ReadKey();
             }
             catch (Exception e)
             {
