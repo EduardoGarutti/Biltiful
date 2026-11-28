@@ -37,7 +37,7 @@ public class Cliente : EntidadeBase
 
             Cliente clienteCarregado = new Cliente(cpf, nome, nascimento, sexo);
 
-            //Esses dados sãao inseridos após a instanciação pois não são atribuidos pelo construtor mas sim gerados automaticamente pela classe base, e são informações variaveis que são alteradas por outros métodos 
+            //Esses dados são inseridos após a instanciação pois não são atribuidos pelo construtor mas sim gerados automaticamente pela classe base, e são informações variaveis que são alteradas por outros métodos 
             clienteCarregado.DataUltimaCompra = DateTime.ParseExact(cliente.Substring(72, 82), "dd/MM/yyyy", CultureInfo.InvariantCulture);
             clienteCarregado.DataCadastro = DateTime.ParseExact(cliente.Substring(82, 92), "dd/MM/yyyy", CultureInfo.InvariantCulture);
             clienteCarregado.Situacao = Enum.Parse<ESituacao>(cliente[92].ToString());
@@ -65,6 +65,7 @@ public class Cliente : EntidadeBase
         ValidarData(nascimento);
         ValidarSexo(sexo);
 
+        //Remove todos os caracteres especiais para então instanciar um objeto 
         cpf = Regex.Replace(cpf, @"\.||\-", "");
 
 
@@ -118,7 +119,7 @@ public class Cliente : EntidadeBase
         DateTime hoje = DateTime.Today;
         int idade = hoje.Year - cliente.DataNascimento.Year;
 
-        //Se o mês e dia do nascimento, sem considerar o ano, for maior que o mês e dia de hoje, subtrai 1 ano pois esse ano o cliente ainda não fez aniversário
+        //Se o mês e dia do nascimento, sem considerar o ano, for maior que o mês e dia de hoje, subtrai 1 ano pois esse ano o cliente ainda não fez aniversário(peguei do Lucas)
         if (cliente.DataNascimento.Date > hoje.AddYears(-idade).Date) idade--;
 
         if (idade < 18) return true;
@@ -136,10 +137,11 @@ public class Cliente : EntidadeBase
 
     public static bool ValidarCPF(string cpf)
     {
-        //Verifica se o CPF segue a formatação de: 3 números, um ponto opcional, 3 números, um ponto opcional, 3 números, um traço opcioal
+        //Verifica se o CPF segue a formatação de: 3 números, um ponto opcional, 3 números, um ponto opcional, 3 números, um traço opcioal e 2 números
         bool EhValido = Regex.IsMatch(cpf, @"^(\d{3}\.?){2}\d{3}\-?\d{2}$");
         if (!EhValido) throw new Exception("O CPF não está no formato correto");
         
+        //Pega os 9 dígitos antes do traço e verifica se eles são todos iguais
         string digitosIniciais = cpf.Replace(".", "")[0..9];
         for (int n = 1; n < digitosIniciais.Length; n++)
         {
@@ -161,6 +163,7 @@ public class Cliente : EntidadeBase
         int indiceDigitosIniciais;
         int indiceNumerosFinais = 0;
 
+        //Pesquisa as fórmulas e métodos pra validar CPF amigão 
         foreach (var digito in digitosFinais)
         {
             soma = 0;
@@ -187,8 +190,10 @@ public class Cliente : EntidadeBase
                     break;
             }
 
+            //Verifica se os 2 últimos dígitos correspondem aos outros 9 de acordo com a fórmula
             if (digitosFinais[indiceNumerosFinais] != cpf[9 + indiceNumerosFinais]) throw new Exception("O CPF não é válido! Os dígitos verificadores não correspondem aos 9 primeiros");
 
+            //Adiciona o primeiro dígito(e também o segundo, mas não importa) pós traço já validado aos dígitos que serão usados para validação 
             digitosIniciais += digitosFinais[indiceNumerosFinais];
 
             indiceNumerosFinais++;
