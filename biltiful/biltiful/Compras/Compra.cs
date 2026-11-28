@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 public class Compra : TransacaoComercial
 {
@@ -30,8 +31,12 @@ public class Compra : TransacaoComercial
         List<Compra> compras,
         string cnpjFornecedor,
         List<Fornecedor> fornecedores,
-        List<Bloqueados> bloqueados)
+        List<string> bloqueados)
     {
+
+        // Normaliza o CNPJ antes de realizar as validações.
+        cnpjFornecedor = Regex.Replace(cnpjFornecedor, @"\D", "");
+
         Fornecedor fornecedor = BuscarFornecedor(
             fornecedores, cnpjFornecedor);
 
@@ -227,16 +232,13 @@ public class Compra : TransacaoComercial
 
     // Verifica se o CNPJ consta na lista de fornecedores bloqueados.
     private static void ValidarFornecedorBloqueado(
-        List<Bloqueados> bloqueados,
-        string cnpjFornecedor)
+    List<string> bloqueados,
+    string cnpjFornecedor)
     {
-        foreach (Bloqueados bloqueado in bloqueados)
+        if (Banidos.Localizar(bloqueados, cnpjFornecedor))
         {
-            if (bloqueado.Id == cnpjFornecedor)
-            {
-                throw new Exception(
-                    "Fornecedor está bloqueado para realizar operações comerciais");
-            }
+            throw new Exception(
+                "Fornecedor está bloqueado para realizar operações comerciais");
         }
     }
 
