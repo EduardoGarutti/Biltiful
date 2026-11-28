@@ -33,7 +33,7 @@ namespace biltiful
                 }
 
                 decimal valorDaVenda = 0;
-                List<Produto> produtosDaCompra = new List<Produto>();
+                List<ItemVenda> produtosDaCompra = new List<ItemVenda>();
 
                 do
                 {
@@ -42,7 +42,7 @@ namespace biltiful
 
                     int indiceProd = Produto.LocalizarProduto(produtos, codigoDeBarra);
 
-                    if (indiceProd == null && indiceProd == -1)
+                    if (indiceProd == -1)
                     {
                         throw new Exception("Produto não encontrado");
                     }
@@ -56,12 +56,24 @@ namespace biltiful
 
                     }
 
-                    Produto produtoAtualDaCompra = produtos[indiceProd];
-                    valorDaVenda += produtoAtualDaCompra.ValorVenda;
+                  
+                    if (quantidadeDeProdutos < 3) {
+                        Console.WriteLine("Deseja adicionar mais produtos? (s/n)");
+                        char resposta = char.Parse(Console.ReadLine().ToLower());
 
-                    if (quantidadeDeProdutos < 2) {
-                        Console.WriteLine("Deseja adicionar mais produtos?");
+                        if(resposta == 'n')
+                        {
+                            usuarioQuerContinuar = false;
+                        }
+                        
                     }
+
+                    ItemVenda produtoAtualDaCompra = new ItemVenda();
+
+                    produtoAtualDaCompra.ProdutoId = produtos[indiceProd].CodigoBarras;
+                    produtoAtualDaCompra.Quantidade = quantVenda;
+
+                    valorDaVenda += produtoAtualDaCompra.ValorUnitario * quantVenda;
 
                     produtosDaCompra.Add(produtoAtualDaCompra);
 
@@ -69,11 +81,14 @@ namespace biltiful
 
                 Venda vendaAtual = Venda.CadastrarVenda(clientes, cpf, valorDaVenda);
 
-                foreach (Produto item in produtosDaCompra) {
+                foreach (ItemVenda item in produtosDaCompra) {
 
-                    ItemVenda.CadastrarItemVenda(itemVendas, vendas, produtos,vendaAtual.Id, item.CodigoBarras, 1);
+                    ItemVenda.CadastrarItemVenda(itemVendas, vendas, produtos,vendaAtual.Id, item.ProdutoId, item.Quantidade);
                         
                 }
+
+                Console.WriteLine("Comprar realizada");
+
             }
             catch (Exception ex)
             {
