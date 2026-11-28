@@ -207,6 +207,7 @@ using biltiful.Menus;
 using biltiful.Repositories;
 using biltiful.Services;
 
+SistemaService allLists = new SistemaService();
 string arquivo = Path.Combine(AppContext.BaseDirectory, "Data", "Usuarios.dat");
 
 var auth = new AutenticacaoService(new UsuarioRepositorio(arquivo));
@@ -234,7 +235,7 @@ while (true)
             Console.ReadLine();
             continue;
         }
-        menu.Exibir(u);
+        menu.Exibir(u, allLists);
     }
     catch (InvalidOperationException ex)
     {

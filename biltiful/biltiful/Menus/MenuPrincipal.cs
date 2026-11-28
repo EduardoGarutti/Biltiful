@@ -6,7 +6,7 @@ public class MenuPrincipal
 {
     private readonly AutorizacaoService _auth;
     public MenuPrincipal(AutorizacaoService auth) => _auth = auth;
-    public void Exibir(Usuario usuario)
+    public void Exibir(Usuario usuario, SistemaService allLists)
     {
         while (true)
         {
