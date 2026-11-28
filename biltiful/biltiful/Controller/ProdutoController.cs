@@ -26,7 +26,7 @@ namespace biltiful.Controller
                 Console.WriteLine("Informe nome do Produto: ");
                 string nomeProduto = Console.ReadLine();
 
-                Console.WriteLine("Informe Valor da venda:");      
+                Console.WriteLine("Informe Valor da venda:");
                 decimal valorVenda = decimal.Parse(Console.ReadLine());
 
                 while (valorVenda is > (decimal)999.99 or <= 0)
@@ -70,10 +70,10 @@ namespace biltiful.Controller
 
                 int id = Produto.LocalizarProduto(produtos, codBarra);
 
-                if (id != -1)
-                {
-                    Console.WriteLine(produtos[id]);
-                }
+                if (id == -1)
+                    throw new Exception("Produto não encontrado!");
+
+                Console.WriteLine(produtos[id]);
             }
             catch (Exception e)
             {
@@ -96,6 +96,9 @@ namespace biltiful.Controller
 
 
                 int id = Produto.LocalizarProduto(produtos, codBarra);
+
+                if (id == -1)
+                    throw new Exception("Produto não encontrado!");
 
                 produtos[id].AlterarSituacao(codBarra);
             }
