@@ -1,7 +1,4 @@
-﻿using biltiful.Producao;
-using System.Globalization;
-
-public static class Utils
+﻿public static class Utils
 {
 
     //A produção requisita a compra
@@ -44,15 +41,41 @@ public static class Utils
         return true;
     }
 
+    public static bool TemEstoque(List<ItemVenda> itemVenda, int qntRequisitada, List<Producao> producao, string idProduto)
+    {
+        int qntProduzida = 0;
+        foreach(var produto in producao)
+        {
+            if(produto.Id.Equals(idProduto))
+                qntProduzida++;
+        }
+
+        if(qntProduzida == 0)
+        {
+            throw new Exception("Não temos esse produto disponivel!");
+        }
+
+        int qntVendida = 0;
+        foreach(var vendas in itemVenda)
+        {
+            if(vendas.ProdutoId == idProduto)
+                qntVendida++;
+        }
+
+        if ((qntProduzida - qntVendida) - qntRequisitada <= 0)
+            throw new Exception("Não temos estoque desse produto!");
+        return true;
+
+    }
     //Função que valida e cria o diretório Dats
-    public static bool ValidarDats()
+    public static bool ValidarData()
     {
         //Concatena caminho + nome do diretório
-        string caminho = AppContext.BaseDirectory + "Dats";
+        string caminho = AppContext.BaseDirectory + "Data";
 
         try
         {
-            //Se o diretório não existe, cria um novo diretório Dats
+            //Se o diretório não existe, cria um novo diretório Data
             if (!Directory.Exists(caminho))
             {
                 Directory.CreateDirectory(caminho);
@@ -86,7 +109,7 @@ public static class Utils
     //Função que valida se aquele caminho existe
     public static bool ValidarCaminho(string caminhoDoArquivo)
     {
-        if (ValidarDats())
+        if (ValidarData())
         {
             if (!File.Exists(caminhoDoArquivo))
 
@@ -108,7 +131,7 @@ public static class Utils
         while (true)
         {
             var op = Utils.CriarMenu(new List<string>(){
-            "Deseja tentar o cadastro novamente?\n",
+            "Deseja tentar novamente?\n",
             "[1] - Sim\n",
             "[2] - Não"
     });

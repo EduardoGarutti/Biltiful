@@ -29,7 +29,14 @@ public abstract class EntidadeBase
 
     public void AlterarSituacao()
     {
-        this.Situacao = ESituacao.I;
+        if(Situacao == ESituacao.A)
+        {
+            Situacao = ESituacao.I;
+        }
+        else
+        {
+            Situacao = ESituacao.A;
+        }
     }
 
 

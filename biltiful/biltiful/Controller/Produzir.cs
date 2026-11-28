@@ -21,10 +21,10 @@ public class Produzir()
 
             if (Produto.LocalizarProduto(Produto.ProdutoAtivos(), codigoDeBarras) == -1)
             {
-               throw new Exception ("Produto não encontrado");
+                throw new Exception("Produto não encontrado");
             }
 
-            Console.WriteLine("Informe a quantidade que deseja produzir:"); 
+            Console.WriteLine("Informe a quantidade que deseja produzir:");
 
             bool quantidadeValida = int.TryParse(Console.ReadLine(), out var quantidade);
 
@@ -41,13 +41,13 @@ public class Produzir()
             Console.WriteLine("Informe quantas Materias primas o produto utiliza?");
 
             bool quantidadeMPValida = int.TryParse(Console.ReadLine(), out var quantidadeMP);
-            
+
             if (!quantidadeMPValida)//imprime e passa
             {
                 throw new Exception("Informe uma Quantidade Válida");
             }
 
-            if(quantidadeMP <= 0 || quantidadeMP >= 99999)
+            if (quantidadeMP <= 0 || quantidadeMP >= 99999)
             {
                 throw new Exception("A Quantidade deve ser maior que 0 e no máximo 99.999!");
             }
@@ -61,7 +61,7 @@ public class Produzir()
                     throw new Exception("Informe um código de Matéria Prima Válido!");
                 }
                 Console.WriteLine($"Informe a Quantidade da {i}ª Materia Prima utilizada por esse produto:");
-                 int quantidadeMateria = int.Parse(Console.ReadLine());
+                int quantidadeMateria = int.Parse(Console.ReadLine());
                 itemProducoes.Add(ItemProducao.CadastrarItemProducao(producao, idMateriaPrima, quantidadeMateria));
 
             }

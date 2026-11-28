@@ -1,7 +1,5 @@
-﻿
-public class Banidos
+﻿public class Banidos
 {
-
     static public List<string> CarregarArquivo(string arquivo)
     {
         try
@@ -16,7 +14,7 @@ public class Banidos
             reader.Close();
             return info;
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             throw new("Não foi possivel ler o arquivo: " + ex.Message);
         }
@@ -58,7 +56,7 @@ public class Banidos
     {
         try
         {
-            if(Localizar(lista, id))
+            if (Localizar(lista, id))
             {
                 throw new Exception("Já existe esse registro");
 
@@ -91,5 +89,5 @@ public class Banidos
             throw new Exception("Erro ao remover banido");
         }
 
-    } 
+    }
 }

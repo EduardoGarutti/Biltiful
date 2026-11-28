@@ -1,11 +1,6 @@
 ﻿public class Comprar()
 {
-    public static void RealizarCompra(
-      List<Fornecedor> fornecedores,
-      List<Compra> compras,
-      List<Bloqueados> bloqueados,
-      List<MateriaPrima> materiasPrimas,
-      List<ItemCompra> itensCompra)
+    public static void RealizarCompra<T>(List<Fornecedor> fornecedores, List<Compra> compras, List<Bloqueados> bloqueados, List<MateriaPrima> materiaPrima)
     {
         // Declara a referência fora do try para permitir seu acesso no catch.
         // Inicialmente, não existe uma compra instanciada.
@@ -87,32 +82,14 @@
             // Exibe os dados da compra utilizando seu ToString().
             Console.WriteLine(compra);
 
-            // Percorre a lista que contém os itens de todas as compras.
-            foreach (var item in itensCompra)
-            {
-                // Exibe somente os itens pertencentes à compra atual.
-                if (item.Id == compra.Id)
-                {
-                    Console.WriteLine(item);
-                }
-            }
-        }
-        catch (Exception ex)
+            compras.Add(Compra.CadastrarCompra(compras, cnpj, fornecedores, bloqueados));
+        } catch(Exception e)
         {
-            // Verifica se a compra foi instanciada e adicionada à lista.
-            if (compra is not null && compras.Contains(compra))
-            {
-                // Remove todos os itens vinculados à compra atual,
-                // evitando que uma compra incompleta permaneça na lista.
-                itensCompra.RemoveAll(item => item.Id == compra.Id);
-
-                // Remove a própria compra da lista.
-                compras.Remove(compra);
-            }
-
-            // Exibe a mensagem da exceção ocorrida durante a operação.
-            Console.WriteLine($"Erro: {ex.Message}");
+            Console.WriteLine("Erro: " + e.Message);
+            RealizarCompra<T>(fornecedores, compras, bloqueados, materiaPrima);
         }
+        
+            Console.WriteLine("Compra realizada com Sucesso!");
     }
 }
 

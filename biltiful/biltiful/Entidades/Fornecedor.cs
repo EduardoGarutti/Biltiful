@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 public class Fornecedor : EntidadeBase
 {
-    public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Dats", "Fornecedor.dat"));
+    public static string CaminhoArquivo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Fornecedor.dat"));
 
     public string CNPJ { get; set; }
     public string RazaoSocial { get; set; }
