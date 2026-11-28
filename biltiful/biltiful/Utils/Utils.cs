@@ -41,9 +41,31 @@
         return true;
     }
 
-    public static bool TemEstoque(List<ItemVenda> itemVenda, int qntRequisitada, List<Producao> producao, int idProduto)
+    public static bool TemEstoque(List<ItemVenda> itemVenda, int qntRequisitada, List<Producao> producao, string idProduto)
     {
+        int qntProduzida = 0;
+        foreach(var produto in producao)
+        {
+            if(produto.Id.Equals(idProduto))
+                qntProduzida++;
+        }
+
+        if(qntProduzida == 0)
+        {
+            throw new Exception("Não temos esse produto disponivel!");
+        }
+
+        int qntVendida = 0;
+        foreach(var vendas in itemVenda)
+        {
+            if(vendas.ProdutoId == idProduto)
+                qntVendida++;
+        }
+
+        if ((qntProduzida - qntVendida) - qntRequisitada <= 0)
+            throw new Exception("Não temos estoque desse produto!");
         return true;
+
     }
     //Função que valida e cria o diretório Dats
     public static bool ValidarData()

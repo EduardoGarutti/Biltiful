@@ -91,11 +91,11 @@ public class Compra : TransacaoComercial
 
     // Grava todas as compras no arquivo com campos de tamanho fixo.
     public static void GravarNoArquivo(
-        List<Compra> compras, string caminhoArquivo)
+        List<Compra> compras)
     {
         // O using garante o descarte do StreamWriter
         // ao finalizar a operação.
-        using (StreamWriter sw = new StreamWriter(caminhoArquivo))
+        using (StreamWriter sw = new StreamWriter(CaminhoArquivo))
         {
             foreach (Compra compra in compras)
             {
